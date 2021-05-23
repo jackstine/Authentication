@@ -1,0 +1,24 @@
+{
+  "name": "@auth/authentication",
+  "version": "0.0.1",
+  "description": "Authentication",
+  "main": "Authentication.js",
+  "scripts": {
+    "test": "export AUTH_ENV=dev && mocha --file src/tests/setup_test.js $(find src/tests/* -name '*.nc.test.js')"
+  },
+  "keywords": [
+    "authentication"
+  ],
+  "author": "Jacob Cukjati",
+  "license": "ISC",
+  "dependencies": {
+    "bluebird": "^3.7.2",
+    "dotenv": "^8.2.0",
+    "jsonwebtoken": "^8.5.1",
+    "pg": "^8.6.0",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "chai": "^4.3.4"
+  }
+}
