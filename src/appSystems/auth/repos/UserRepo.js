@@ -27,5 +27,4 @@ class UserRepo {
   }
 }
 
-// TODO cover your UserRepo as new UR()
 module.exports = UserRepo

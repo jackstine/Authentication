@@ -18,9 +18,10 @@ class Token {
         throw Error(`Object "${plugin}" does not exist in plugin`)
       }
     }
+    this.keyStore = options.keyStore
     this.passwordRepo = new PasswordRepo({plugin: this.plugin.PasswordRepo})
     this.userRepo = new UserRepo({plugin: this.plugin.UserRepo})
-    this.tokenRepo = new TokenRepo({plugin: this.plugin.TokenRepo})
+    this.tokenRepo = new TokenRepo({plugin: this.plugin.TokenRepo, keyStore: this.keyStore})
   }
   /**
    * 

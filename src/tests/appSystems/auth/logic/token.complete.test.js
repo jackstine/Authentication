@@ -1,6 +1,6 @@
 const {Token} = require('../../../../appSystems/auth/logic/token')
 const {Users} = require('../../../../appSystems/auth/logic/users')
-const PluginMock = require('../../../../plugins/pluginMock')
+const {tokenMock, usersMock} = require('../../../mocks')
 let chai = require('chai')
 let expect = chai.expect
 chai.should()
@@ -16,11 +16,11 @@ let userInfo = {
   password: 'password'
 }
 let vc = 'd4a2435d-9287-414c-aee7-824d5527e1d7'
-let token = new Token({plugin: PluginMock})
+let token = new Token({...tokenMock})
 
 describe('Token', function () {
   before(function (done) {
-    token = new Token({plugin: PluginMock})
+    token = new Token({...tokenMock})
     done()
   })
 
@@ -43,7 +43,7 @@ describe('Token', function () {
   })
   it('#login', function (done) {
     let password = userInfo.password
-    let users = new Users({plugin: PluginMock})
+    let users = new Users({...usersMock})
     users.createUserVerificationAndPassword(userInfo).then(async (userVerification) => {
       let loginResponse = await token.login(userInfo.userId, password)
       expect(loginResponse.success).to.be.equal(true)

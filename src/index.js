@@ -1,9 +1,19 @@
 const DefaultPlugin = require('./plugins/pluginInterface')
 const {Users, Token} = require('./appSystems/auth/logic')
+const {DEFAULT_KEY_STORE, DEFAULT_TEMP_PASS} = require('./constants')
 
+/**
+ * config object
+ * {plugin}
+ * {keyStore: {keyCount, timeLimit}}
+ * {temporaryPasswordOptions: {tempPasswordLifetime}}
+ */
 class Authentication {
   constructor (config) {
     this.plugin = DefaultPlugin
+    // TODO return the timelimit on temp passwords
+    this.keyStore = {...DEFAULT_KEY_STORE, ...config.keyStore}
+    this.tempPasswordOptions = {...DEFAULT_TEMP_PASS, ...config.temporaryPasswordOptions}
     this.addPlugin(config.plugin)
   }
   addPlugin(plugin) {
@@ -23,16 +33,45 @@ class Authentication {
 
   create () {
     return {
-      users: new Users(this.plugin),
-      token: new Token(this.plugin)
+      __users: new Users({
+        plugin: this.plugin,
+        tempPasswordOptions: this.tempPasswordOptions
+      }),
+      __token: new Token({
+        plugin: this.plugin, 
+        keyStore: this.keyStore
+      })
+    }
+  }
+}
+
+let AUTH = {
+  get users() {
+    if (this.__users) {
+      return this.__users
+    } else {
+      throw Error(`Must instantiate createAuthentication() first`)
+    }
+  },
+  get token() {
+    if (this.__token) {
+      return this.__token
+    } else {
+      throw Error(`Must instantiate createAuthentication() first`)
     }
   }
 }
 
 module.exports = {
-  auth: null,
+  auth: AUTH,
   createAuthentication: async function (config) {
-    this.auth = new Authentication(config).create()
+    if (!config.plugin) {
+      throw Error('There must be a Plugin for the createAuthentication')
+    }
+    let auth = new Authentication(config).create()
+    for (let key of Object.keys(auth)) {
+      AUTH[key] = auth[key]
+    }
   }
 }
 /**

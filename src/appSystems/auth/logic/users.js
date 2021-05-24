@@ -16,8 +16,12 @@ class Users {
       }
     }
     this.plugin = options.plugin
+    this.options = options
     this.userVerificationRepo = new UserVerificationRepo({plugin: this.plugin.UserVerificationRepo})
-    this.temporaryPasswordRepo = new TemporaryPasswordRepo({plugin: this.plugin.TemporaryPasswordRepo})
+    this.temporaryPasswordRepo = new TemporaryPasswordRepo({
+      plugin: this.plugin.TemporaryPasswordRepo,
+      options: options.tempPasswordOptions
+    })
     this.userRepo = new UserRepo({plugin: this.plugin.UserRepo})
     this.passwordRepo = new PasswordRepo({plugin: this.plugin.PasswordRepo})
   }

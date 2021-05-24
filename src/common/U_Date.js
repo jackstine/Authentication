@@ -33,7 +33,7 @@ export const timeTillAM = function(date) {
     return timeTillBeginningOfDay - timeTillDate
 }
 
-//TODO not sure if the getDate should look at the UTCDate, because this will depend on the type of computer
+//not sure if the getDate should look at the UTCDate, because this will depend on the type of computer
 //that one gets, this could be off, since this was created during the time that is based off the stock market
 //we will need to make sure that the stock market time is correct when make decisions in UTC, if not
 //then I will have to resort to using a StockMarket timing library

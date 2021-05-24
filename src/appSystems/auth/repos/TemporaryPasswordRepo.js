@@ -1,14 +1,15 @@
 const CRYPT = require('../../../common/crypt')
 
 class TemporaryPasswordRepo {
-  constructor({plugin}) {
+  constructor({plugin, options}) {
     this.plugin = plugin
-    this.MINUTES = 15
-    this.TIME_LIMIT = 1000 * 60 * this.MINUTES
+    this.TIME_LIMIT = options.tempPasswordLifetime
   }
   async createTempPassword (userid) {
     let newRandomPassword = CRYPT.generateRandomString(10)
-    return await this.plugin.insertNewUserIdAndPassword(userid.toLowerCase(), newRandomPassword, new Date())
+    let tempPassword = await this.plugin.insertNewUserIdAndPassword(userid.toLowerCase(), newRandomPassword, new Date())
+    tempPassword.expiresIn = this.TIME_LIMIT
+    return tempPassword
   }
 
   async verifyTemporyPassword (id, password) {
@@ -31,5 +32,4 @@ class TemporaryPasswordRepo {
   }
 }
 
-// JAKE TODO need to implement new Object
 module.exports = TemporaryPasswordRepo

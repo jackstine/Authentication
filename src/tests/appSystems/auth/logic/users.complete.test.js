@@ -1,5 +1,5 @@
 const {Users} = require('../../../../appSystems/auth/logic/users')
-const PluginMock = require('../../../../plugins/pluginMock')
+const {usersMock} = require('../../../mocks')
 let chai = require('chai')
 let expect = chai.expect
 chai.should()
@@ -11,13 +11,13 @@ let userInfo = {
 }
 let userInfoClone = {...userInfo}
 let vc = '3e5764ed-fa5a-4e40-be4e-fbe228d009d2'
-let users = new Users({plugin: PluginMock})
+let users = new Users({...usersMock})
 
 describe('Users', function () {
   beforeEach((done => {
-    PluginMock.reset()
+    usersMock.plugin.reset()
     userInfo = {...userInfoClone}
-    users = new Users({plugin: PluginMock})
+    users = new Users({...usersMock})
     done()
   }))
   it('#createUserVerificationAndPassword', function (done) {
@@ -44,9 +44,10 @@ describe('Users', function () {
   it('#forgotPassword', function (done) {
     users.createUserVerificationAndPassword(userInfo).then(userAndVerification => {
       users.forgotPassword(userInfo.userId).then(userInfoTempPassword => {
-        let {userId, password} = userInfoTempPassword
+        let {userId, password, expiresIn} = userInfoTempPassword
         expect(userId).to.be.equal(userInfo.userId.toLowerCase())
         expect(password).to.be.a('string')
+        expect(expiresIn).to.be.a('number')
         done()
       }).catch(console.error)
     }).catch(console.error)

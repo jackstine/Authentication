@@ -10,15 +10,10 @@ class TokenRepo {
     if (!options.plugin) {
       throw Error(`There is no plugin for the package`)
     }
-    // TODO make sure that the options contains info about the how long and how many
-    // TODO move these to the options in the Authentication index.js file
-    // That is where default values should be
-    this.MAX_COUNT = options.numOfKeys || 10
+    this.MAX_COUNT = options.keyStore.keyCount
     this.__keys = undefined
     this.__keyStore = undefined
-    // hours minutes seconds miliseconds
-    let ONE_DAY = 1000 * 60 * 60 * 24
-    this.TIME_LIMIT = options.timeLimit || ONE_DAY
+    this.TIME_LIMIT = options.keyStore.timeLimit
     this.__lastInsertTimestamp = undefined
     this.plugin = options.plugin
   }

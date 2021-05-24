@@ -22,5 +22,4 @@ class UserVerificationRepo {
   }
 }
 
-// TODO add new
 module.exports = UserVerificationRepo
