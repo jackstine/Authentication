@@ -12,12 +12,12 @@ describe('KeyStore', function () {
         done()
       })
     })
-    it('should getLastKey', function (done) {
-      console.log(keyStore.getLastKey())
+    it('should getFirstKey', function (done) {
+      console.log(keyStore.getFirstKey())
       done()
     })
-    it('should sliceAKey', function (done) {
-      keyStore.sliceAKey()
+    it('should shiftAKey', function (done) {
+      keyStore.shiftAKey()
       console.log(keyStore.__keys)
       done()
     })

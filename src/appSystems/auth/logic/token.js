@@ -4,29 +4,48 @@ const TokenRepo = require('../repos/TokenRepo')
 const Bluebird = require('bluebird')
 
 class Token {
+  /**
+   * 
+   * @param {passwordRepo, userRepo, tokenRepo} options.plugin 
+   */
   constructor (options) {
     if (!options.plugin) {
       throw Error(`plugin does not exist for Users Logic`)
     }
     this.plugin = options.plugin
-    this.passwordRepo = new PasswordRepo(this.plugin.passwordRepo)
-    this.userRepo = new UserRepo(this.plugin.userRepo)
-    this.tokenRepo = new TokenRepo(this.plugin.tokenRepo)
+    for (let plugin of ['PasswordRepo', 'UserRepo', 'TokenRepo']) {
+      if (!this.plugin[plugin]) {
+        throw Error(`Object "${plugin}" does not exist in plugin`)
+      }
+    }
+    this.passwordRepo = new PasswordRepo({plugin: this.plugin.PasswordRepo})
+    this.userRepo = new UserRepo({plugin: this.plugin.UserRepo})
+    this.tokenRepo = new TokenRepo({plugin: this.plugin.TokenRepo})
   }
+  /**
+   * 
+   * @param {*} userId 
+   */
   async generateToken (userId) {
     let keyStore = await this.tokenRepo.getKeyStore()
     return await keyStore.generateNewToken(userId)
   }
+  /**
+   * 
+   * @param {*} token 
+   */
   async authenticateToken (token) {
     let keyStore = await this.tokenRepo.getKeyStore()
     return keyStore.checkToken(token)
   }
+  /**
+   * 
+   * @param {*} userId 
+   * @param {*} password 
+   */
   async login (userId, password) {
-    let results = await Bluebird.props({
-      success: this.passwordRepo.checkPassword(userId, password),
-      userIsVerified: this.userRepo.userIsVerified(userId)
-    })
-    if (results.success && results.userIsVerified) {
+    let passwordResult = await this.passwordRepo.checkPassword(userId, password)
+    if (passwordResult) {
       return {success: true, token: await this.generateToken(userId)}
     } else {
       return {success: false}
@@ -34,7 +53,6 @@ class Token {
   }
 }
 
-// JAKE TODO need to correct Token
 module.exports = {
   Token
 }

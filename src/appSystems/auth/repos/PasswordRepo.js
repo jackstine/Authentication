@@ -3,16 +3,16 @@ const {v4: uuid4} = require('uuid')
 
 class PasswordRepo {
   constructor(options) {
-    if (options.plugin) {
+    if (!options.plugin) {
       throw Error('there is no plugin')
     }
-    this.plugin = plugin
+    this.plugin = options.plugin
   }
 
   async insert(userId, password) {
     let key = uuid4()
     let encryptedPassword = await CRYPT.crypt.en(password, key)
-    return this.plugin.insertPassword({id, password: encryptedPassword, key})
+    return this.plugin.insertPassword({userId, password: encryptedPassword, key})
   }
 
   async update (id, oldPassword, newPassword) {
@@ -35,13 +35,13 @@ class PasswordRepo {
 
   async checkPassword (id, password) {
     let data = await this.plugin.getPasswordForId(id)
-    if (data.key) {
+    try {
       return password === await CRYPT.crypt.de(data.password, data.key)
-    } else {
-      return data.password === password
+    } catch (ex) {
+      console.error(ex)
+      throw ex
     }
   }
 }
 
-// TODO set the new
 module.exports = PasswordRepo

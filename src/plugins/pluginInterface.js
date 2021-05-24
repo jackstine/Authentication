@@ -1,18 +1,18 @@
 module.exports = {
   TemporaryPasswordRepo: {
-    async insertNewUserIdAndPassword(userid, newRandomPassword) {
+    async insertNewUserIdAndPassword(userid, newRandomPassword, createdTimestamp) {
       let functionName = 'insertNewUserIdAndPassword'
       throw Error(`The plugin function ${functionName} is not implemented`)
     },
-    async selectTemporaryPasswordById() {
+    async selectTemporaryPasswordById(userid) {
       let functionName = 'selectTemporaryPasswordById'
       throw Error(`The plugin function ${functionName} is not implemented`)
     },
-    async deleteAllOldTempPasswords () {
+    async deleteAllOldTempPasswords (timesUpLimit) {
       let functionName = 'deleteAllOldTempPasswords'
       throw Error(`The plugin function ${functionName} is not implemented`)
     },
-    async deleteTempPassword (id) {
+    async deleteTempPassword (userid) {
       let functionName = 'deleteTempPassword'
       throw Error(`The plugin function ${functionName} is not implemented`)
     }
@@ -26,27 +26,37 @@ module.exports = {
       let functionName = 'deleteTheOldestKey'
       throw Error(`The plugin function ${functionName} is not implemented`)
     },
-    async insertNewKey (key, dateCreated) {
+    /**
+     * 
+     * @param {*} key 
+     * @param {*} created 
+     * @param {key, created}
+     */
+    async insertNewKey (key, created) {
       let functionName = 'insertNewKey'
       throw Error(`The plugin function ${functionName} is not implemented`)
     }
   },
   UserRepo: {
-    async getUserVerified (userId) {
-      let functionName = 'getUserVerified'
+    async getUserIsVerified (userId) {
+      let functionName = 'getUserIsVerified'
       throw Error(`The plugin function ${functionName} is not implemented`)
     },
-    async verifyUser () {
+    async verifyUser (userId) {
       let functionName = 'verifyUser'
       throw Error(`The plugin function ${functionName} is not implemented`)
     },
-    async createUser({userId}) {
+    /**
+     * required to have userId
+     * @param {*} user 
+     */
+    async createUser(user) {
       let functionName = 'createUser'
       throw Error(`The plugin function ${functionName} is not implemented`)
     }
   },
   UserVerificationRepo: {
-    async getVerificationCode () {
+    async getVerificationCode (verificationCode) {
       let functionName = 'getVerificationCode'
       throw Error(`The plugin function ${functionName} is not implemented`)
     },
@@ -60,7 +70,7 @@ module.exports = {
     }
   },
   PasswordRepo: {
-    async insertPassword({id, password, key}) {
+    async insertPassword({userId, password, key}) {
       let functionName = 'insertPassword'
       throw Error(`The plugin function ${functionName} is not implemented`)
     },

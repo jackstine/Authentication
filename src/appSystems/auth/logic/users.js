@@ -10,19 +10,31 @@ class Users {
       throw Error(`plugin does not exist for Users Logic`)
     }
     this.plugin = options.plugin
-    this.userVerificationRepo = new UserVerificationRepo(this.plugin.userVerificationRepo)
-    this.temporaryPasswordRepo = new TemporaryPasswordRepo(this.plugin.temporaryPasswordRepo)
-    this.userRepo = new UserRepo(this.plugin.userRepo)
-    this.passwordRepo = new PasswordRepo(this.plugin.passwordRepo)
+    for (let plugin of ['UserVerificationRepo', 'TemporaryPasswordRepo', 'UserRepo', 'PasswordRepo']) {
+      if (!this.plugin[plugin]) {
+        throw Error(`Object "${plugin}" does not exist in plugin`)
+      }
+    }
+    this.plugin = options.plugin
+    this.userVerificationRepo = new UserVerificationRepo({plugin: this.plugin.UserVerificationRepo})
+    this.temporaryPasswordRepo = new TemporaryPasswordRepo({plugin: this.plugin.TemporaryPasswordRepo})
+    this.userRepo = new UserRepo({plugin: this.plugin.UserRepo})
+    this.passwordRepo = new PasswordRepo({plugin: this.plugin.PasswordRepo})
   }
   /**
    * 
    * @param {password, uersId} userInfo 
    */
   async createUserVerificationAndPassword (userInfo) {
+    if (!userInfo.userId) {
+      throw Error('must contain userId attribute in Object')
+    }
+    if (!userInfo.password) {
+      throw Error('must contain password attribute in Object')
+    }
     let password = userInfo.password
     delete userInfo.password
-    userInfo.userId = userInfo.userId
+    let userId = userInfo.userId
     let userData = await Bluebird.props({
       user: this.userRepo.createUser({userId}),
       verification: this.userVerificationRepo.createVerificationCode(userInfo.userId),
@@ -33,11 +45,19 @@ class Users {
   }
 
 
+  /**
+   * {
+        userId: 'jacobcukjati@gmail.com',
+        verificationCode: 'fb2e2a6a-088d-4e79-9b89-f258b48a03f3'
+      }
+      { userId: 'jacobcukjati@gmail.com', verified: true }
+   * @param {*} verificationCode 
+   */
   async verifyUser (verificationCode) {
     let userVC = await this.userVerificationRepo.getVerificationCode(verificationCode)
     if (userVC) {
       await this.userVerificationRepo.delete(verificationCode)
-      return await this.userRepo.verifyUser(userVC.user_id)
+      return await this.userRepo.verifyUser(userVC.userId)
     } else {
       return false
     }
@@ -57,8 +77,7 @@ class Users {
 
   async forgotPassword (userId) {
     let tempPassword = await this.temporaryPasswordRepo.createTempPassword(userId)
-    // TODO needs to be in the plugin function
-    // TODO email the temp password to the user
+    return tempPassword
   }
 }
 

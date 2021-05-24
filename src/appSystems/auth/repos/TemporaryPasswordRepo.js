@@ -1,14 +1,14 @@
 const CRYPT = require('../../../common/crypt')
 
 class TemporaryPasswordRepo {
-  constructor(plugin) {
+  constructor({plugin}) {
     this.plugin = plugin
     this.MINUTES = 15
     this.TIME_LIMIT = 1000 * 60 * this.MINUTES
   }
   async createTempPassword (userid) {
     let newRandomPassword = CRYPT.generateRandomString(10)
-    return await this.plugin.insertNewUserIdAndPassword(userid.toLowerCase(), newRandomPassword)
+    return await this.plugin.insertNewUserIdAndPassword(userid.toLowerCase(), newRandomPassword, new Date())
   }
 
   async verifyTemporyPassword (id, password) {
@@ -17,7 +17,7 @@ class TemporaryPasswordRepo {
   }
 
   async deleteAllOldTempPasswords () {
-    await this.plugin.deleteAllOldTempPasswords()
+    await this.plugin.deleteAllOldTempPasswords(this.TIME_LIMIT)
   }
 
   async delete (id) {

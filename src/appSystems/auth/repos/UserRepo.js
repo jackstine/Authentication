@@ -6,15 +6,22 @@ class UserRepo {
     this.plugin = options.plugin
   }
 
-  async createUser({userId}) {
-    return this.plugin.createUser(userId.toLowerCase())
+  /**
+   * 
+   * @param {*} user 
+   */
+  async createUser(user) {
+    if (!user.userId) {
+      throw Error('must contain userId attribute in user Object')
+    }
+    user.userId = user.userId.toLowerCase()
+    return this.plugin.createUser(user)
   }
 
   async userIsVerified (userId) {
-    return this.plugin.getUserVerified(userId.toLowerCase())
+    return this.plugin.getUserIsVerified(userId.toLowerCase())
   }
 
-  // TODO this is causing conflict find a solution for it
   async verifyUser (userId) {
     return this.plugin.verifyUser(userId.toLowerCase())
   }
