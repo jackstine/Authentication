@@ -34,7 +34,7 @@ class Users {
     delete userInfo.password
     let user_id = userInfo.user_id
     let userData = await Bluebird.props({
-      user: this.userRepo.createUser({user_id}),
+      user: this.userRepo.createUser(userInfo),
       verification: this.userVerificationRepo.createVerificationCode(userInfo.user_id),
       password: this.passwordRepo.insert(userInfo.user_id, password)
     })
