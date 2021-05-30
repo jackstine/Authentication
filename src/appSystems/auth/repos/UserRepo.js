@@ -31,7 +31,11 @@ class UserRepo {
   }
 
   async getUser (user_id) {
-    return this.plugin.getUser(user_id.toLowerCase())
+    if (user_id) {
+      return this.plugin.getUser(user_id.toLowerCase())
+    } else {
+      return null
+    }
   }
 }
 

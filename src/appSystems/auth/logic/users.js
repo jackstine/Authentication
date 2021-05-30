@@ -91,6 +91,10 @@ class Users {
       return null
     }
   }
+
+  async getUser(user_id) {
+    return await this.userRepo.getUser(user_id)
+  }
 }
 
 

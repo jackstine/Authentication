@@ -53,7 +53,7 @@ module.exports = {
     },
     async getUser (user) {
       let users = userRepo.filter(el => el.user_id === user)
-      return users[0]
+      return users[0] ?? null
     }
   },
   UserVerificationRepo: {

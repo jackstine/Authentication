@@ -129,4 +129,25 @@ describe('Users', function () {
       }).catch(console.error)
     })
   })
+  describe('#getUser', function () {
+    it('should get the user', function (done) {
+      users.createUserVerificationAndPassword(userInfo).then(async userAndVerification => {
+        let {user, verification, password} = userAndVerification
+        let gu = await users.getUser(user.user_id)
+        expect(gu.user_id).to.be.equal(user.user_id)
+        done()
+      }).catch(console.error)
+    })
+    it('should return null when the user does not exist', function (done) {
+      users.getUser('garjack').then(async user => {
+        expect(user).to.be.null
+        user = await users.getUser(null).catch(console.error)
+        expect(user).to.be.null
+        user = await users.getUser(null)
+        expect(user).to.be.null
+        done()
+      })
+    })
+  })
 })
+
