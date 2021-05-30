@@ -30,7 +30,7 @@ class PasswordRepo {
   async __OverrideUpdatePasswordNeverUseOnlyDireSituations (id, newPassword) {
     let key = uuid4()
     let encryptedPassword = await CRYPT.crypt.en(newPassword, key)
-    return this.plugin.updatePasswordOnlyShouldBeUsedOnce({id, password: encryptedPassword, key}).then(resp => {
+    return this.plugin.updatePasswordOnlyShouldBeUsedOnce(id, encryptedPassword, key).then(resp => {
       return true
     })
   }

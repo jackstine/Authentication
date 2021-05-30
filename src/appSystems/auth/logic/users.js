@@ -39,7 +39,7 @@ class Users {
       password: this.passwordRepo.insert(userInfo.user_id, password)
     })
     delete userData.password
-    return userData
+    return {...userData, user}
   }
 
 
