@@ -1,8 +1,3 @@
-const PasswordRepo = require('../repos/PasswordRepo')
-const UserRepo = require('../repos/UserRepo')
-const TokenRepo = require('../repos/TokenRepo')
-const Bluebird = require('bluebird')
-
 class Token {
   /**
    * 
@@ -13,15 +8,17 @@ class Token {
       throw Error(`plugin does not exist for Users Logic`)
     }
     this.plugin = options.plugin
-    for (let plugin of ['PasswordRepo', 'UserRepo', 'TokenRepo']) {
+    for (let plugin of ['PasswordRepo', 'UserRepo', 'TokenRepo', 'TemporaryPasswordRepo']) {
       if (!this.plugin[plugin]) {
         throw Error(`Object "${plugin}" does not exist in plugin`)
       }
     }
+    this.repos = options.repos
     this.keyStore = options.keyStore
-    this.passwordRepo = new PasswordRepo({plugin: this.plugin.PasswordRepo})
-    this.userRepo = new UserRepo({plugin: this.plugin.UserRepo})
-    this.tokenRepo = new TokenRepo({plugin: this.plugin.TokenRepo, keyStore: this.keyStore})
+    this.passwordRepo = this.repos.passwordRepo
+    this.userRepo = this.repos.userRepo
+    this.tokenRepo = this.repos.tokenRepo
+    this.temporaryPasswordRepo = this.repos.temporaryPasswordRepo
   }
   /**
    * 
@@ -49,7 +46,12 @@ class Token {
     if (passwordResult) {
       return {success: true, token: await this.generateToken(user_id)}
     } else {
-      return {success: false}
+      let isForgottenPassword = await this.temporaryPasswordRepo.verifyTemporyPassword(user_id, password)
+      if (isForgottenPassword) {
+        return {success: true, verifiedWithTemporary: true}
+      } else {
+        return {success: false}
+      }
     }
   }
 }

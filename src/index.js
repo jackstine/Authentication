@@ -1,6 +1,13 @@
 const DefaultPlugin = require('./plugins/pluginInterface')
 const {Users, Token} = require('./appSystems/auth/logic')
 const {DEFAULT_KEY_STORE, DEFAULT_TEMP_PASS} = require('./constants')
+const {
+  PasswordRepo,
+  TemporaryPasswordRepo,
+  TokenRepo,
+  UserRepo,
+  UserVerificationRepo
+} = require('./appSystems/auth/repos')
 
 /**
  * config object
@@ -11,9 +18,12 @@ const {DEFAULT_KEY_STORE, DEFAULT_TEMP_PASS} = require('./constants')
 class Authentication {
   constructor (config) {
     this.plugin = DefaultPlugin
+    this.repos = {}
     // TODO return the timelimit on temp passwords
-    this.keyStore = {...DEFAULT_KEY_STORE, ...config.keyStore}
-    this.tempPasswordOptions = {...DEFAULT_TEMP_PASS, ...config.temporaryPasswordOptions}
+    this.options = {
+      keyStore: {...DEFAULT_KEY_STORE, ...config.keyStore},
+      tempPasswordOptions: {...DEFAULT_TEMP_PASS, ...config.temporaryPasswordOptions}
+    }
     this.addPlugin(config.plugin)
   }
   addPlugin(plugin) {
@@ -32,14 +42,27 @@ class Authentication {
   }
 
   create () {
+    // TODO set the mocks to MAX
+    this.repos = {
+      passwordRepo: new PasswordRepo({plugin: this.plugin.PasswordRepo}),
+      userRepo: new UserRepo({plugin: this.plugin.UserRepo}),
+      tokenRepo: new TokenRepo({plugin: this.plugin.TokenRepo, keyStore: this.options.keyStore}),
+      temporaryPasswordRepo: new TemporaryPasswordRepo({
+        plugin: this.plugin.TemporaryPasswordRepo,
+        options: this.options.tempPasswordOptions
+      }),
+      userVerificationRepo: new UserVerificationRepo({plugin: this.plugin.UserVerificationRepo})
+    }
     return {
       __users: new Users({
         plugin: this.plugin,
-        tempPasswordOptions: this.tempPasswordOptions
+        repos: this.repos,
+        ...this.options
       }),
       __token: new Token({
-        plugin: this.plugin, 
-        keyStore: this.keyStore
+        plugin: this.plugin,
+        repos: this.repos,
+        ...this.options
       })
     }
   }

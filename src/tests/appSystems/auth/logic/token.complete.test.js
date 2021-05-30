@@ -18,6 +18,8 @@ let userInfo = {
 let vc = 'd4a2435d-9287-414c-aee7-824d5527e1d7'
 let token = new Token({...tokenMock})
 
+// TODO need to update the tests so that they are more like the auth-pg tests
+
 describe('Token', function () {
   before(function (done) {
     token = new Token({...tokenMock})
@@ -41,14 +43,28 @@ describe('Token', function () {
       })
     }).catch(console.error)
   })
-  it('#login', function (done) {
-    let password = userInfo.password
-    let users = new Users({...usersMock})
-    users.createUserVerificationAndPassword(userInfo).then(async (userVerification) => {
-      let loginResponse = await token.login(userInfo.user_id, password)
-      expect(loginResponse.success).to.be.equal(true)
-      expect(loginResponse.token).to.be.a('string')
-      done()
+  describe('#login', function () {
+    it('should login the user', function (done) {
+      let password = userInfo.password
+      let users = new Users({...usersMock})
+      users.createUserVerificationAndPassword(userInfo).then(async (userVerification) => {
+        let loginResponse = await token.login(userInfo.user_id, password)
+        expect(loginResponse.success).to.be.equal(true)
+        expect(loginResponse.token).to.be.a('string')
+        done()
+      })
+    })
+    it('should recognize that the user used forgotten password', function (done) {
+      userInfo.password = 'password'
+      let users = new Users({...usersMock})
+      users.createUserVerificationAndPassword(userInfo).then((userVerification) => {
+        users.forgotPassword(userInfo.user_id).then(async userInfoTempPassword => {
+          let loginResponse = await token.login(userInfo.user_id, userInfoTempPassword.password)
+          expect(loginResponse.success).to.be.equal(true)
+          expect(loginResponse.verifiedWithTemporary).to.be.equal(true)
+          done()
+        })
+      }).catch(console.error)
     })
   })
 })
