@@ -1,10 +1,10 @@
 module.exports = {
   TemporaryPasswordRepo: {
-    async insertNewUserIdAndPassword(userid, newRandomPassword, createdTimestamp) {
+    async insertNewUserIdAndPassword(user_id, newRandomPassword, createdTimestamp) {
       let functionName = 'insertNewUserIdAndPassword'
       throw Error(`The plugin function ${functionName} is not implemented`)
     },
-    async selectTemporaryPasswordById(userid) {
+    async selectTemporaryPasswordById(user_id) {
       let functionName = 'selectTemporaryPasswordById'
       throw Error(`The plugin function ${functionName} is not implemented`)
     },
@@ -12,7 +12,7 @@ module.exports = {
       let functionName = 'deleteAllOldTempPasswords'
       throw Error(`The plugin function ${functionName} is not implemented`)
     },
-    async deleteTempPassword (userid) {
+    async deleteTempPassword (user_id) {
       let functionName = 'deleteTempPassword'
       throw Error(`The plugin function ${functionName} is not implemented`)
     }
@@ -38,11 +38,11 @@ module.exports = {
     }
   },
   UserRepo: {
-    async getUserIsVerified (userId) {
+    async getUserIsVerified (user_id) {
       let functionName = 'getUserIsVerified'
       throw Error(`The plugin function ${functionName} is not implemented`)
     },
-    async verifyUser (userId) {
+    async verifyUser (user_id) {
       let functionName = 'verifyUser'
       throw Error(`The plugin function ${functionName} is not implemented`)
     },
@@ -60,7 +60,7 @@ module.exports = {
       let functionName = 'getVerificationCode'
       throw Error(`The plugin function ${functionName} is not implemented`)
     },
-    async createVerificationCode (userId, vc) {
+    async createVerificationCode (user_id, vc) {
       let functionName = 'createVerificationCode'
       throw Error(`The plugin function ${functionName} is not implemented`)
     },
@@ -70,7 +70,7 @@ module.exports = {
     }
   },
   PasswordRepo: {
-    async insertPassword({userId, password, key}) {
+    async insertPassword({user_id, password, key}) {
       let functionName = 'insertPassword'
       throw Error(`The plugin function ${functionName} is not implemented`)
     },

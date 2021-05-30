@@ -25,11 +25,11 @@ class Token {
   }
   /**
    * 
-   * @param {*} userId 
+   * @param {*} user_id 
    */
-  async generateToken (userId) {
+  async generateToken (user_id) {
     let keyStore = await this.tokenRepo.getKeyStore()
-    return await keyStore.generateNewToken(userId)
+    return await keyStore.generateNewToken(user_id)
   }
   /**
    * 
@@ -41,13 +41,13 @@ class Token {
   }
   /**
    * 
-   * @param {*} userId 
+   * @param {*} user_id 
    * @param {*} password 
    */
-  async login (userId, password) {
-    let passwordResult = await this.passwordRepo.checkPassword(userId, password)
+  async login (user_id, password) {
+    let passwordResult = await this.passwordRepo.checkPassword(user_id, password)
     if (passwordResult) {
-      return {success: true, token: await this.generateToken(userId)}
+      return {success: true, token: await this.generateToken(user_id)}
     } else {
       return {success: false}
     }

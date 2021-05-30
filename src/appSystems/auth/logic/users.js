@@ -30,19 +30,19 @@ class Users {
    * @param {password, uersId} userInfo 
    */
   async createUserVerificationAndPassword (userInfo) {
-    if (!userInfo.userId) {
-      throw Error('must contain userId attribute in Object')
+    if (!userInfo.user_id) {
+      throw Error('must contain user_id attribute in Object')
     }
     if (!userInfo.password) {
       throw Error('must contain password attribute in Object')
     }
     let password = userInfo.password
     delete userInfo.password
-    let userId = userInfo.userId
+    let user_id = userInfo.user_id
     let userData = await Bluebird.props({
-      user: this.userRepo.createUser({userId}),
-      verification: this.userVerificationRepo.createVerificationCode(userInfo.userId),
-      password: this.passwordRepo.insert(userInfo.userId, password)
+      user: this.userRepo.createUser({user_id}),
+      verification: this.userVerificationRepo.createVerificationCode(userInfo.user_id),
+      password: this.passwordRepo.insert(userInfo.user_id, password)
     })
     delete userData.password
     return userData
@@ -51,36 +51,37 @@ class Users {
 
   /**
    * {
-        userId: 'jacobcukjati@gmail.com',
+        user_id: 'jacobcukjati@gmail.com',
         verificationCode: 'fb2e2a6a-088d-4e79-9b89-f258b48a03f3'
       }
-      { userId: 'jacobcukjati@gmail.com', verified: true }
+      { user_id: 'jacobcukjati@gmail.com', verified: true }
    * @param {*} verificationCode 
    */
   async verifyUser (verificationCode) {
     let userVC = await this.userVerificationRepo.getVerificationCode(verificationCode)
     if (userVC) {
       await this.userVerificationRepo.delete(verificationCode)
-      return await this.userRepo.verifyUser(userVC.userId)
+      return await this.userRepo.verifyUser(userVC.user_id)
     } else {
       return false
     }
   }
 
-  async resetPasswordFromTemporaryPassword (userId, tempPassword, newPassword) {
-    let verifiedTempPassword = await this.temporaryPasswordRepo.verifyTemporyPassword(userId, tempPassword)
+  async resetPasswordFromTemporaryPassword (user_id, tempPassword, newPassword) {
+    let verifiedTempPassword = await this.temporaryPasswordRepo.verifyTemporyPassword(user_id, tempPassword)
     if (verifiedTempPassword) {
-      return await Bluebird.props({
-        temp: this.temporaryPasswordRepo.delete(userId),
-        newPassword: this.passwordRepo.__OverrideUpdatePasswordNeverUseOnlyDireSituations(userId, newPassword)
+      let result = await Bluebird.props({
+        temp: this.temporaryPasswordRepo.delete(user_id),
+        newPassword: this.passwordRepo.__OverrideUpdatePasswordNeverUseOnlyDireSituations(user_id, newPassword)
       })
+      return result.newPassword && result.temp
     } else {
       return false
     }
   }
 
-  async forgotPassword (userId) {
-    let tempPassword = await this.temporaryPasswordRepo.createTempPassword(userId)
+  async forgotPassword (user_id) {
+    let tempPassword = await this.temporaryPasswordRepo.createTempPassword(user_id)
     return tempPassword
   }
 }

@@ -59,18 +59,26 @@ let AUTH = {
     } else {
       throw Error(`Must instantiate createAuthentication() first`)
     }
-  }
+  },
+  __created: false
 }
 
 module.exports = {
   auth: AUTH,
   createAuthentication: async function (config) {
-    if (!config.plugin) {
-      throw Error('There must be a Plugin for the createAuthentication')
+    if (!AUTH.__created) {
+      if (!config.plugin) {
+        throw Error('There must be a plugin attribute in the config for the createAuthentication()')
+      }
+      let auth = new Authentication(config).create()
+      for (let key of Object.keys(auth)) {
+        AUTH[key] = auth[key]
+      }
+      AUTH.__created = true
     }
-    let auth = new Authentication(config).create()
-    for (let key of Object.keys(auth)) {
-      AUTH[key] = auth[key]
+    return {
+      auth: AUTH,
+      config
     }
   }
 }

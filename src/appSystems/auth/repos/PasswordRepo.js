@@ -9,10 +9,10 @@ class PasswordRepo {
     this.plugin = options.plugin
   }
 
-  async insert(userId, password) {
+  async insert(user_id, password) {
     let key = uuid4()
     let encryptedPassword = await CRYPT.crypt.en(password, key)
-    return this.plugin.insertPassword({userId, password: encryptedPassword, key})
+    return this.plugin.insertPassword({user_id, password: encryptedPassword, key})
   }
 
   async update (id, oldPassword, newPassword) {
@@ -30,7 +30,9 @@ class PasswordRepo {
   async __OverrideUpdatePasswordNeverUseOnlyDireSituations (id, newPassword) {
     let key = uuid4()
     let encryptedPassword = await CRYPT.crypt.en(newPassword, key)
-    return this.plugin.updatePasswordOnlyShouldBeUsedOnce({id, password: encryptedPassword, key})
+    return this.plugin.updatePasswordOnlyShouldBeUsedOnce({id, password: encryptedPassword, key}).then(resp => {
+      return true
+    })
   }
 
   async checkPassword (id, password) {

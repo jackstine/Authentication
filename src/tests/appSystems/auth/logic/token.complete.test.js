@@ -11,7 +11,7 @@ let userInfo = {
   lastName: 'cukjati',
   username: 'jacobCukjati@gmail.com',
   email: 'jacobCukjati@gmail.com',
-  userId: 'jacobCukjati@gmail.com',
+  user_id: 'jacobCukjati@gmail.com',
   phone: '8503616563',
   password: 'password'
 }
@@ -25,7 +25,7 @@ describe('Token', function () {
   })
 
   it('#generateToken', function (done) {
-    token.generateToken(userInfo.userId).then(generatedAuthToken => {
+    token.generateToken(userInfo.user_id).then(generatedAuthToken => {
       expect(generatedAuthToken).to.be.an('string')
       done()
     }).catch(console.error)
@@ -45,7 +45,7 @@ describe('Token', function () {
     let password = userInfo.password
     let users = new Users({...usersMock})
     users.createUserVerificationAndPassword(userInfo).then(async (userVerification) => {
-      let loginResponse = await token.login(userInfo.userId, password)
+      let loginResponse = await token.login(userInfo.user_id, password)
       expect(loginResponse.success).to.be.equal(true)
       expect(loginResponse.token).to.be.a('string')
       done()

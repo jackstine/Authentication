@@ -9,12 +9,26 @@ class UserVerificationRepo {
   }
 
   async getVerificationCode (verificationCode) {
-    return await this.plugin.getVerificationCode(verificationCode)
+    verificationCode =  await this.plugin.getVerificationCode(verificationCode)
+    if (!verificationCode.user_id) {
+      throw Error('plugin UserVerificationRepo getVerificationCode() must return object with an attribute of "user_id"')
+    }
+    if (!verificationCode.verification_code) {
+      throw Error('plugin UserVerificationRepo getVerificationCode() must return object with an attribute of "verification_code"')
+    }
+    return verificationCode
   }
 
-  async createVerificationCode (userId) {
+  async createVerificationCode (user_id) {
     let vc = uuid4()
-    return await this.plugin.createVerificationCode(userId.toLowerCase(), vc)
+    let verificationCode = await this.plugin.createVerificationCode(user_id.toLowerCase(), vc)
+    if (!verificationCode.user_id) {
+      throw Error('plugin UserVerificationRepo createVerificationCode() must return object with an attribute of "user_id"')
+    }
+    if (!verificationCode.verification_code) {
+      throw Error('plugin UserVerificationRepo createVerificationCode() must return object with an attribute of "verification_code"')
+    }
+    return verificationCode
   }
 
   async delete(verificationCode) {

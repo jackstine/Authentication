@@ -6,21 +6,22 @@ let passwordRepo = []
 
 module.exports = {
   TemporaryPasswordRepo: {
-    async insertNewUserIdAndPassword(userId, newRandomPassword, createdTimestamp) {
-      let record = {userId, password: newRandomPassword, created: createdTimestamp}
+    async insertNewUserIdAndPassword(user_id, newRandomPassword, createdTimestamp) {
+      let record = {user_id, password: newRandomPassword, created: createdTimestamp}
       temporaryPasswordRepo.push(record)
       return record
     },
-    async selectTemporaryPasswordById(userId) {
-      return temporaryPasswordRepo.find(el => el.userId === userId)
+    async selectTemporaryPasswordById(user_id) {
+      return temporaryPasswordRepo.find(el => el.user_id === user_id)
     },
     async deleteAllOldTempPasswords (timesUpLimit) {
       temporaryPasswordRepo = temporaryPasswordRepo.filter(el => {
         return el.createdTimestamp >= timesUpLimit
       })
     },
-    async deleteTempPassword (userId) {
-      temporaryPasswordRepo = temporaryPasswordRepo.filter(el => el.userId !== userId)
+    async deleteTempPassword (user_id) {
+      temporaryPasswordRepo = temporaryPasswordRepo.filter(el => el.user_id !== user_id)
+      return true
     }
   },
   TokenRepo: {
@@ -37,54 +38,54 @@ module.exports = {
     }
   },
   UserRepo: {
-    async getUserIsVerified (userId) {
-      return userRepo.filter(el => el.userId === userId).map(el => el.verified)[0]
+    async getUserIsVerified (user_id) {
+      return userRepo.filter(el => el.user_id === user_id).map(el => el.verified)[0]
     },
-    async verifyUser (userId) {
-      let user =  userRepo.filter(el => el.userId === userId)[0]
+    async verifyUser (user_id) {
+      let user =  userRepo.filter(el => el.user_id === user_id)[0]
       user.verified = true
       return user
     },
     async createUser(user) {
-      let record = {userId: user.userId, verified: false}
+      let record = {user_id: user.user_id, verified: false}
       userRepo.push(record)
       return record
     }
   },
   UserVerificationRepo: {
-    async getVerificationCode (verificationCode) {
-      let record = userVerificationRepo.filter(el => el.verificationCode === verificationCode)
+    async getVerificationCode (verification_code) {
+      let record = userVerificationRepo.filter(el => el.verification_code === verification_code)
       return record.length === 1 ? record[0] : null
     },
-    async createVerificationCode (userId, vc) {
-      let record = {userId, verificationCode: vc}
+    async createVerificationCode (user_id, vc) {
+      let record = {user_id, verification_code: vc}
       userVerificationRepo.push(record)
       return record
     },
-    async deleteVerificationCode(verificationCode) {
-      let indexToDelete = userVerificationRepo.findIndex(el => el.verificationCode === verificationCode)
+    async deleteVerificationCode(verification_code) {
+      let indexToDelete = userVerificationRepo.findIndex(el => el.verification_code === verification_code)
       userVerificationRepo.splice(indexToDelete)
     }
   },
   PasswordRepo: {
-    async insertPassword({userId, password, key}) {
-      let record = {userId, password, key}
+    async insertPassword({user_id, password, key}) {
+      let record = {user_id, password, key}
       passwordRepo.push(record)
       return record
     },
-    async deletePasswordById (userId) {
-      let indexOfPassword = passwordRepo.findIndex(el => el.userId === userId)
+    async deletePasswordById (user_id) {
+      let indexOfPassword = passwordRepo.findIndex(el => el.user_id === user_id)
       passwordRepo.splice(indexOfPassword, 1)
     },
-    async updatePasswordOnlyShouldBeUsedOnce (userId, password, key) {
-      let record = passwordRepo.filter(el => el.userId === userId)
+    async updatePasswordOnlyShouldBeUsedOnce (user_id, password, key) {
+      let record = passwordRepo.filter(el => el.user_id === user_id)
       if (record.length === 1) {
         record.password = password
         record.key = key
       }
     },
-    async getPasswordForId (userId) {
-      let record = passwordRepo.filter(el => el.userId === userId)
+    async getPasswordForId (user_id) {
+      let record = passwordRepo.filter(el => el.user_id === user_id)
       return record[0]
     }
   },

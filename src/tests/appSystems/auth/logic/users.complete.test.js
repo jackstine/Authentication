@@ -5,7 +5,7 @@ let expect = chai.expect
 chai.should()
 
 let userInfo = {
-  userId: 'jacobCukjati@gmail.com',
+  user_id: 'jacobCukjati@gmail.com',
   password: 'password',
   newPassword: 'newPassword'
 }
@@ -23,10 +23,10 @@ describe('Users', function () {
   it('#createUserVerificationAndPassword', function (done) {
     users.createUserVerificationAndPassword(userInfo).then(userAndVerification => {
       let {user, verification, password} = userAndVerification
-      expect(user.userId).to.be.equal(userInfo.userId.toLowerCase())
+      expect(user.user_id).to.be.equal(userInfo.user_id.toLowerCase())
       expect(user.verified).to.be.equal(false)
-      expect(verification.userId).to.be.equal(userInfo.userId.toLowerCase())
-      expect(verification.verificationCode).to.be.a('string')
+      expect(verification.user_id).to.be.equal(userInfo.user_id.toLowerCase())
+      expect(verification.verification_code).to.be.a('string')
       expect(password).to.be.undefined
       done()
     }).catch(console.error)
@@ -34,18 +34,18 @@ describe('Users', function () {
   it('#verifyUser', function (done) {
     users.createUserVerificationAndPassword(userInfo).then(userAndVerification => {
       let {verification} = userAndVerification
-      users.verifyUser(verification.verificationCode).then(userInfo => {
-        expect(userInfo.userId).to.be.equal(userInfo.userId.toLowerCase())
-        expect(userInfo.verified).to.be.equal(true)
+      users.verifyUser(verification.verification_code).then(user => {
+        expect(user.verified).to.be.equal(true)
+        expect(user.user_id).to.be.equal(userInfo.user_id.toLowerCase())
         done()
       }).catch(console.error)
     }).catch(console.error)
   })
   it('#forgotPassword', function (done) {
     users.createUserVerificationAndPassword(userInfo).then(userAndVerification => {
-      users.forgotPassword(userInfo.userId).then(userInfoTempPassword => {
-        let {userId, password, expiresIn} = userInfoTempPassword
-        expect(userId).to.be.equal(userInfo.userId.toLowerCase())
+      users.forgotPassword(userInfo.user_id).then(userInfoTempPassword => {
+        let {user_id, password, expiresIn} = userInfoTempPassword
+        expect(user_id).to.be.equal(userInfo.user_id.toLowerCase())
         expect(password).to.be.a('string')
         expect(expiresIn).to.be.a('number')
         done()
@@ -54,10 +54,9 @@ describe('Users', function () {
   })
   it('#resetPasswordFromTemporaryPassword', function (done) {
     users.createUserVerificationAndPassword(userInfo).then(userAndVerification => {
-      users.forgotPassword(userInfo.userId).then(userInfoTempPassword => {
-        users.resetPasswordFromTemporaryPassword(userInfo.userId, userInfoTempPassword.password, userInfo.newPassword).then(resp => {
-          expect(resp.temp).to.be.undefined
-          expect(resp.newPassword).to.be.undefined
+      users.forgotPassword(userInfo.user_id).then(userInfoTempPassword => {
+        users.resetPasswordFromTemporaryPassword(userInfo.user_id, userInfoTempPassword.password, userInfo.newPassword).then(resp => {
+          expect(resp).to.be.equal(true)
           done()
         }).catch(console.error)
       }).catch(console.error)
