@@ -33,8 +33,12 @@ class Token {
    * @param {*} token 
    */
   async authenticateToken (token) {
-    let keyStore = await this.tokenRepo.getKeyStore()
-    return keyStore.checkToken(token)
+    try {
+      let keyStore = await this.tokenRepo.getKeyStore()
+      return await keyStore.checkToken(token)
+    } catch (ex) {
+      return false
+    }
   }
   /**
    * 
@@ -42,17 +46,18 @@ class Token {
    * @param {*} password 
    */
   async login (user_id, password) {
-    let passwordResult = await this.passwordRepo.checkPassword(user_id, password)
-    if (passwordResult) {
-      return {success: true, token: await this.generateToken(user_id)}
-    } else {
-      let isForgottenPassword = await this.temporaryPasswordRepo.verifyTemporyPassword(user_id, password)
-      if (isForgottenPassword) {
-        return {success: true, verifiedWithTemporary: true}
+    if (user_id && password) {
+      let passwordResult = await this.passwordRepo.checkPassword(user_id, password)
+      if (passwordResult) {
+        return {success: true, token: await this.generateToken(user_id)}
       } else {
-        return {success: false}
+        let isForgottenPassword = await this.temporaryPasswordRepo.verifyTemporyPassword(user_id, password)
+        if (isForgottenPassword) {
+          return {success: true, verifiedWithTemporary: true}
+        }
       }
     }
+    return {success: false}
   }
 }
 

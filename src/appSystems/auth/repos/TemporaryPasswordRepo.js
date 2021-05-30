@@ -17,7 +17,11 @@ class TemporaryPasswordRepo {
 
   async verifyTemporyPassword (id, password) {
     let data = await this.plugin.selectTemporaryPasswordById(id.toLowerCase())
-    return this.__withinTimeLimit(data.created) && data.password === password
+    if (data) {
+      return this.__withinTimeLimit(data.created) && data.password === password
+    } else {
+      return false
+    }
   }
 
   async deleteAllOldTempPasswords () {

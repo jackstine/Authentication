@@ -37,12 +37,14 @@ class PasswordRepo {
 
   async checkPassword (id, password) {
     let data = await this.plugin.getPasswordForId(id)
-    try {
-      return password === await CRYPT.crypt.de(data.password, data.key)
-    } catch (ex) {
-      console.error(ex)
-      throw ex
+    if (data) {
+      try {
+        return password === await CRYPT.crypt.de(data.password, data.key)
+      } catch (ex) {
+        // ignore, just send false
+      }
     }
+    return false
   }
 }
 

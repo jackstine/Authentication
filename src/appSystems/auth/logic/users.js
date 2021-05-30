@@ -1,7 +1,3 @@
-const UserVerificationRepo = require('../repos/UserVerificationRepo')
-const TemporaryPasswordRepo = require('../repos/TemporaryPasswordRepo')
-const UserRepo = require('../repos/UserRepo')
-const PasswordRepo = require('../repos/PasswordRepo')
 const Bluebird = require('bluebird')
 
 class Users {
@@ -61,26 +57,39 @@ class Users {
       await this.userVerificationRepo.delete(verificationCode)
       return await this.userRepo.verifyUser(userVC.user_id)
     } else {
-      return false
+      return {verified: false}
     }
   }
 
   async resetPasswordFromTemporaryPassword (user_id, tempPassword, newPassword) {
-    let verifiedTempPassword = await this.temporaryPasswordRepo.verifyTemporyPassword(user_id, tempPassword)
-    if (verifiedTempPassword) {
-      let result = await Bluebird.props({
-        temp: this.temporaryPasswordRepo.delete(user_id),
-        newPassword: this.passwordRepo.__OverrideUpdatePasswordNeverUseOnlyDireSituations(user_id, newPassword)
-      })
-      return result.newPassword && result.temp
-    } else {
+    try {
+      let verifiedTempPassword = await this.temporaryPasswordRepo.verifyTemporyPassword(user_id, tempPassword)
+      if (verifiedTempPassword) {
+        let result = await Bluebird.props({
+          temp: this.temporaryPasswordRepo.delete(user_id),
+          newPassword: this.passwordRepo.__OverrideUpdatePasswordNeverUseOnlyDireSituations(user_id, newPassword)
+        })
+        return result.newPassword && result.temp
+      } else {
+        return false
+      }
+    } catch (ex) {
       return false
     }
   }
 
   async forgotPassword (user_id) {
-    let tempPassword = await this.temporaryPasswordRepo.createTempPassword(user_id)
-    return tempPassword
+    try {
+      let user = await this.userRepo.getUser(user_id)
+      if (user) {
+        let tempPassword = await this.temporaryPasswordRepo.createTempPassword(user_id)
+        return tempPassword
+      } else {
+        return null
+      }
+    } catch (ex) {
+      return null
+    }
   }
 }
 

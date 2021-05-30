@@ -1,6 +1,7 @@
 const {Token} = require('../../../../appSystems/auth/logic/token')
 const {Users} = require('../../../../appSystems/auth/logic/users')
 const {tokenMock, usersMock} = require('../../../mocks')
+const MockPlugin = require('../../../../plugins/pluginMock')
 let chai = require('chai')
 let expect = chai.expect
 chai.should()
@@ -26,24 +27,45 @@ describe('Token', function () {
     done()
   })
 
-  it('#generateToken', function (done) {
-    token.generateToken(userInfo.user_id).then(generatedAuthToken => {
-      expect(generatedAuthToken).to.be.an('string')
-      done()
-    }).catch(console.error)
-  })
-  it('#authenticateToken', function (done) {
-    token.generateToken(userInfo).then(async generatedAuthToken => {
-      expect(generatedAuthToken).to.be.an('string')
-      let auth = await token.authenticateToken(generatedAuthToken)
-      auth.should.be.equal(true)
-      await token.authenticateToken('eyJhbGciOiJIUzI1NiJ9.bmFtZUByYWVtaXN0ZW1haWwuY29t.d5qu_8bzMwhWygglDWKbY9n4daCYbnbR4w-enghUI5c').catch(resp => {
-        // this means it threw an error
+  describe('#generateToken',function () {
+    it('should generate a token', function (done) {
+      token.generateToken(userInfo.user_id).then(generatedAuthToken => {
+        expect(generatedAuthToken).to.be.an('string')
+        done()
+      }).catch(console.error)
+    })
+    it('should fail when a undefined or null is inserted', function (done) {
+      token.generateToken(null).catch(err => {
+        expect(err.message).to.be.a('string')
         done()
       })
-    }).catch(console.error)
+    })
+  })
+  describe('#authenticateToken', function () {
+    it('it should authenticate the user', function (done) {
+      token.generateToken(userInfo).then(async generatedAuthToken => {
+        expect(generatedAuthToken).to.be.an('string')
+        let auth = await token.authenticateToken(generatedAuthToken)
+        auth.should.be.equal(true)
+        done()
+      }).catch(console.error)
+    })
+    it('it should return false on false authentication', function (done) {
+      token.generateToken(userInfo).then(async generatedAuthToken => {
+        expect(generatedAuthToken).to.be.an('string')
+        let auth = await token.authenticateToken(generatedAuthToken)
+        auth.should.be.equal(true)
+        let authResp = await token.authenticateToken('eyJhbGciOiJIUzI1NiJ9.bmFtZUByYWVtaXN0ZW1haWwuY29t.d5qu_8bzMwhWygglDWKbY9n4daCYbnbR4w-enghUI5c')
+        expect(authResp).to.be.equal(false)
+        done()
+      }).catch(console.error)
+    })
   })
   describe('#login', function () {
+    before(function (done) {
+      MockPlugin.reset()
+      done()
+    })
     it('should login the user', function (done) {
       let password = userInfo.password
       let users = new Users({...usersMock})
@@ -53,7 +75,7 @@ describe('Token', function () {
         expect(loginResponse.token).to.be.a('string')
         done()
       })
-    })
+    })// END OF IT
     it('should recognize that the user used forgotten password', function (done) {
       userInfo.password = 'password'
       let users = new Users({...usersMock})
@@ -63,8 +85,41 @@ describe('Token', function () {
           expect(loginResponse.success).to.be.equal(true)
           expect(loginResponse.verifiedWithTemporary).to.be.equal(true)
           done()
-        })
+        }).catch(console.error)
       }).catch(console.error)
-    })
+    })//END OF IT
+    it('should return false if the password is not valid', function (done) {
+      userInfo.password = 'password'
+      let users = new Users({...usersMock})
+      users.createUserVerificationAndPassword(userInfo).then((userVerification) => {
+        users.forgotPassword(userInfo.user_id).then(async userInfoTempPassword => {
+          let loginResponse = await token.login(userInfo.user_id, null)
+          expect(loginResponse.success).to.be.equal(false)
+          done()
+        }).catch(console.error)
+      }).catch(console.error)
+    })//END OF IT
+    it('should return false if the user is null', function (done) {
+      userInfo.password = 'password'
+      let users = new Users({...usersMock})
+      users.createUserVerificationAndPassword(userInfo).then((userVerification) => {
+        users.forgotPassword(userInfo.user_id).then(async userInfoTempPassword => {
+          let loginResponse = await token.login(null, null)
+          expect(loginResponse.success).to.be.equal(false)
+          done()
+        }).catch(console.error)
+      }).catch(console.error)
+    })//END OF IT
+    it('should return false if the user does not exist', function (done) {
+      userInfo.password = 'password'
+      let users = new Users({...usersMock})
+      users.createUserVerificationAndPassword(userInfo).then((userVerification) => {
+        users.forgotPassword(userInfo.user_id).then(async userInfoTempPassword => {
+          let loginResponse = await token.login('garjack', 'crap')
+          expect(loginResponse.success).to.be.equal(false)
+          done()
+        }).catch(console.error)
+      }).catch(console.error)
+    })//END OF IT
   })
 })

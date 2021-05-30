@@ -10,13 +10,16 @@ class UserVerificationRepo {
 
   async getVerificationCode (verificationCode) {
     verificationCode =  await this.plugin.getVerificationCode(verificationCode)
-    if (!verificationCode.user_id) {
-      throw Error('plugin UserVerificationRepo getVerificationCode() must return object with an attribute of "user_id"')
+    if (verificationCode) {
+      if (!verificationCode.user_id) {
+        throw Error('plugin UserVerificationRepo getVerificationCode() must return object with an attribute of "user_id"')
+      }
+      if (!verificationCode.verification_code) {
+        throw Error('plugin UserVerificationRepo getVerificationCode() must return object with an attribute of "verification_code"')
+      }
+      return verificationCode
     }
-    if (!verificationCode.verification_code) {
-      throw Error('plugin UserVerificationRepo getVerificationCode() must return object with an attribute of "verification_code"')
-    }
-    return verificationCode
+    return false
   }
 
   async createVerificationCode (user_id) {

@@ -29,6 +29,10 @@ class UserRepo {
   async verifyUser (user_id) {
     return this.plugin.verifyUser(user_id.toLowerCase())
   }
+
+  async getUser (user_id) {
+    return this.plugin.getUser(user_id.toLowerCase())
+  }
 }
 
 module.exports = UserRepo

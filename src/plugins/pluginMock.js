@@ -50,6 +50,10 @@ module.exports = {
       let record = {user_id: user.user_id, verified: false}
       userRepo.push(record)
       return record
+    },
+    async getUser (user) {
+      let users = userRepo.filter(el => el.user_id === user)
+      return users[0]
     }
   },
   UserVerificationRepo: {
