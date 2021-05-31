@@ -25,8 +25,7 @@ class Token {
    * @param {*} user_id 
    */
   async generateToken (user_id) {
-    let keyStore = await this.tokenRepo.getKeyStore()
-    return await keyStore.generateNewToken(user_id)
+    return await this.tokenRepo.generateNewToken(user_id)
   }
   /**
    * 

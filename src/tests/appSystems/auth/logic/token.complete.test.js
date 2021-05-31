@@ -30,7 +30,8 @@ describe('Token', function () {
   describe('#generateToken',function () {
     it('should generate a token', function (done) {
       token.generateToken(userInfo.user_id).then(generatedAuthToken => {
-        expect(generatedAuthToken).to.be.an('string')
+        expect(generatedAuthToken.token).to.be.an('string')
+        expect(generatedAuthToken.expires).to.be.an('number')
         done()
       }).catch(console.error)
     })
@@ -44,16 +45,16 @@ describe('Token', function () {
   describe('#authenticateToken', function () {
     it('it should authenticate the user', function (done) {
       token.generateToken(userInfo).then(async generatedAuthToken => {
-        expect(generatedAuthToken).to.be.an('string')
-        let auth = await token.authenticateToken(generatedAuthToken)
+        expect(generatedAuthToken.token).to.be.an('string')
+        let auth = await token.authenticateToken(generatedAuthToken.token)
         auth.should.be.equal(true)
         done()
       }).catch(console.error)
     })
     it('it should return false on false authentication', function (done) {
       token.generateToken(userInfo).then(async generatedAuthToken => {
-        expect(generatedAuthToken).to.be.an('string')
-        let auth = await token.authenticateToken(generatedAuthToken)
+        expect(generatedAuthToken.token).to.be.an('string')
+        let auth = await token.authenticateToken(generatedAuthToken.token)
         auth.should.be.equal(true)
         let authResp = await token.authenticateToken('eyJhbGciOiJIUzI1NiJ9.bmFtZUByYWVtaXN0ZW1haWwuY29t.d5qu_8bzMwhWygglDWKbY9n4daCYbnbR4w-enghUI5c')
         expect(authResp).to.be.equal(false)
@@ -72,9 +73,10 @@ describe('Token', function () {
       users.createUserVerificationAndPassword(userInfo).then(async (userVerification) => {
         let loginResponse = await token.login(userInfo.user_id, password)
         expect(loginResponse.success).to.be.equal(true)
-        expect(loginResponse.token).to.be.a('string')
+        expect(loginResponse.token.token).to.be.a('string')
+        expect(loginResponse.token.expires).to.be.a('number')
         done()
-      })
+      }).catch(console.error)
     })// END OF IT
     it('should recognize that the user used forgotten password', function (done) {
       userInfo.password = 'password'

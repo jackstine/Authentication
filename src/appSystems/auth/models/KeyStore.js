@@ -23,7 +23,8 @@ class KeyStore {
   }
 
   async generateNewToken (tokenizeObject) {
-    return await crypt.en(tokenizeObject, this.getFirstKey())
+    let keyPair = this.getFirstKey()
+    return await crypt.en(tokenizeObject, keyPair.key)
   }
 
   async __generateNewTokenUsingLastKey (tokenizeObject) {
@@ -31,7 +32,7 @@ class KeyStore {
   }
 
   getFirstKey () {
-    return this.__keys[0].key
+    return this.__keys[0]
   }
 
   shiftAKey (newKey, created) {

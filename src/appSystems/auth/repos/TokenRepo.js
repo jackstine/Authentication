@@ -32,6 +32,15 @@ class TokenRepo {
     return this.__keyStore
   }
 
+  async generateNewToken (user_id) {
+    let keyStore = await this.getKeyStore()
+    let newToken =  await keyStore.generateNewToken(user_id)
+    return {
+      token: newToken,
+      expires: await this.__timeRemaining()
+    }
+  }
+
   async __getAllKeys() {
     if (!this.__keyStore) {
       let keys = await this.plugin.returnAllKeysFromRepo()
@@ -89,6 +98,16 @@ class TokenRepo {
       return new Date() > new Date(nextInsert)
     } else {
       return true
+    }
+  }
+
+  async __timeRemaining() {
+    let lastInsert = await this.__timeFromLastInsert()
+    if (lastInsert) {
+      let nextInsert = new Date().setTime(lastInsert.getTime() + this.TIME_LIMIT)
+      return nextInsert - new Date().getTime()
+    } else {
+      return this.TIME_LIMIT
     }
   }
 
