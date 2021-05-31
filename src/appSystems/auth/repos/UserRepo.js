@@ -37,6 +37,11 @@ class UserRepo {
       return null
     }
   }
+
+  async updateUser (userInfo) {
+    userInfo.user_id = userInfo.user_id.toLowerCase()
+    return this.plugin.updateUser(userInfo)
+  }
 }
 
 module.exports = UserRepo

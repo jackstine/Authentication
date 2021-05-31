@@ -42,6 +42,15 @@ class Users {
     return {...userData, user}
   }
 
+  async updateUser (userInfo) {
+    try {
+      let success = await this.userRepo.updateUser(userInfo)
+      return {success, user: userInfo}
+    } catch (ex) {
+      return {success: false}
+    }
+  }
+
 
   /**
    * {

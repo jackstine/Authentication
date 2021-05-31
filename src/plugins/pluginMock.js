@@ -54,6 +54,17 @@ module.exports = {
     async getUser (user) {
       let users = userRepo.filter(el => el.user_id === user)
       return users[0] ?? null
+    },
+    async updateUser (userInfo) {
+      let update = false
+      for (let i in userRepo) {
+        let u = userRepo[i]
+        if (u.user_id === userInfo.user_id) {
+          update = true
+          userRepo[i] = {...u, ...userInfo}
+        }
+      }
+      return update
     }
   },
   UserVerificationRepo: {

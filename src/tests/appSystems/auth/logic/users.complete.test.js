@@ -9,6 +9,10 @@ let userInfo = {
   password: 'password',
   newPassword: 'newPassword'
 }
+let userUpdateInfo = {
+  user_id: userInfo.user_id,
+  shirt: 'large'
+}
 let userInfoClone = {...userInfo}
 let vc = '3e5764ed-fa5a-4e40-be4e-fbe228d009d2'
 let users = new Users({...usersMock})
@@ -147,6 +151,25 @@ describe('Users', function () {
         expect(user).to.be.null
         done()
       })
+    })
+  })
+  describe('#updateUser', function () {
+    it('should update the user', function (done) {
+      users.createUserVerificationAndPassword(userInfo).then(async userAndVerification => {
+        users.updateUser(userUpdateInfo).then(resp => {
+          expect(resp.success).to.be.equal(true)
+          expect(resp.user.shirt).to.be.equal(userUpdateInfo.shirt)
+          done()
+        }).catch(console.error)
+      })
+    })
+    it('should return false if the user does not exist', function (done) {
+      users.updateUser({user_id: 'something'}).then(async resp => {
+        expect(resp.success).to.be.equal(false)
+        resp = await users.updateUser(null)
+        expect(resp.success).to.be.equal(false)
+        done()
+      }).catch(console.error)
     })
   })
 })

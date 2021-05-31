@@ -57,6 +57,10 @@ module.exports = {
     async getUser(user) {
       let fuctionName = 'getUser'
       throw Error(`The plugin function ${fuctionName} is not implemented`)
+    },
+    async updateUser (user) {
+      let fuctionName = 'updateUser'
+      throw Error(`The plugin function ${fuctionName} is not implemented`)
     }
   },
   UserVerificationRepo: {
