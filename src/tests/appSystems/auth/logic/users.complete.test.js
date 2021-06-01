@@ -27,12 +27,14 @@ describe('Users', function () {
   describe('#createUserVerificationAndPassword', function () {
     it('it should create a user and their password', function (done) {
       users.createUserVerificationAndPassword(userInfo).then(userAndVerification => {
-        let {user, verification, password} = userAndVerification
+        let {user, verification, password, token} = userAndVerification
         expect(user.user_id).to.be.equal(userInfo.user_id.toLowerCase())
         expect(user.verified).to.be.equal(false)
         expect(verification.user_id).to.be.equal(userInfo.user_id.toLowerCase())
         expect(verification.verification_code).to.be.a('string')
         expect(password).to.be.undefined
+        expect(token.token).to.be.a('string')
+        expect(token.expires).to.be.a('number')
         done()
       }).catch(console.error)
     })

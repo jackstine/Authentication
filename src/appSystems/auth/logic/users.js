@@ -18,6 +18,7 @@ class Users {
     this.temporaryPasswordRepo = this.repos.temporaryPasswordRepo
     this.userRepo = this.repos.userRepo
     this.passwordRepo = this.repos.passwordRepo
+    this.tokenRepo = this.repos.tokenRepo
   }
   /**
    * 
@@ -36,7 +37,8 @@ class Users {
     let user = await this.userRepo.createUser(userInfo)
     let userData = await Bluebird.props({
       verification: this.userVerificationRepo.createVerificationCode(userInfo.user_id),
-      password: this.passwordRepo.insert(userInfo.user_id, password)
+      password: this.passwordRepo.insert(userInfo.user_id, password),
+      token: this.tokenRepo.generateNewToken(user_id)
     })
     delete userData.password
     return {...userData, user}

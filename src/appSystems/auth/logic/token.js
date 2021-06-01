@@ -48,7 +48,8 @@ class Token {
     if (user_id && password) {
       let passwordResult = await this.passwordRepo.checkPassword(user_id, password)
       if (passwordResult) {
-        return {success: true, token: await this.generateToken(user_id)}
+        let ps = await Promise.all([this.generateToken(user_id), this.userRepo.getUser(user_id)])
+        return {success: true, token: ps[0], user: ps[1]}
       } else {
         let isForgottenPassword = await this.temporaryPasswordRepo.verifyTemporyPassword(user_id, password)
         if (isForgottenPassword) {

@@ -19,7 +19,6 @@ class Authentication {
   constructor (config) {
     this.plugin = DefaultPlugin
     this.repos = {}
-    // TODO return the timelimit on temp passwords
     this.options = {
       keyStore: {...DEFAULT_KEY_STORE, ...config.keyStore},
       tempPasswordOptions: {...DEFAULT_TEMP_PASS, ...config.temporaryPasswordOptions}
@@ -42,7 +41,6 @@ class Authentication {
   }
 
   create () {
-    // TODO set the mocks to MAX
     this.repos = {
       passwordRepo: new PasswordRepo({plugin: this.plugin.PasswordRepo}),
       userRepo: new UserRepo({plugin: this.plugin.UserRepo}),
@@ -88,6 +86,35 @@ let AUTH = {
 
 module.exports = {
   auth: AUTH,
+  /**
+   * 
+   * @param {Object} config - the config object
+   * @param {Object} config.plugin - the plugin object
+   * @param {Object} config.plugin.TemporaryPasswordRepo - the Tempoary Password Repo, will manage those CRUDs
+   * @param {Function(user_id, newRandomPassword, createdTimestamp)} config.plugin.TemporaryPasswordRepo.insertNewUserIdAndPassword
+   * @param {Function(user_id)} config.plugin.TemporaryPasswordRepo.selectTemporaryPasswordById
+   * @param {Function(timesUpLimit)} config.plugin.TemporaryPasswordRepo.deleteAllOldTempPasswords
+   * @param {Function(user_id)} config.plugin.TemporaryPasswordRepo.deleteTempPassword
+   * @param {Object} config.plugin.TokenRepo - the TokenRepo, will manage those CRUDs
+   * @param {Function()} config.plugin.TokenRepo.returnAllKeysFromRepo
+   * @param {Function()} config.plugin.TokenRepo.deleteTheOldestKey
+   * @param {Function(key, created)} config.plugin.TokenRepo.insertNewKey
+   * @param {Object} config.plugin.UserRepo- the UserRepo, will manage those CRUDs
+   * @param {Function(user_id)} config.plugin.UserRepo.getUserIsVerified
+   * @param {Function(user_id)} config.plugin.UserRepo.verifyUser
+   * @param {Function(user)} config.plugin.UserRepo.createUser
+   * @param {Function(user)} config.plugin.UserRepo.getUser
+   * @param {Function(user)} config.plugin.UserRepo.updateUser
+   * @param {Object} config.plugin.UserVerificationRepo- the UserVerificationRepo, will manage those CRUDs
+   * @param {Function(verification_code)} config.plugin.UserVerificationRepo.getVerificationCode
+   * @param {Function(user_id, verification_code)} config.plugin.UserVerificationRepo.createVerificationCode
+   * @param {Function(verification_code)} config.plugin.UserVerificationRepo.deleteVerificationCode
+   * @param {Object} config.plugin.PasswordRepo- the PasswordRepo, will manage those CRUDs
+   * @param {Function({user_id, password, key})} config.plugin.PasswordRepo.insertPassword
+   * @param {Function(user_id)} config.plugin.PasswordRepo.deletePasswordById
+   * @param {Function(user_id, password, key)} config.plugin.PasswordRepo.updatePasswordOnlyShouldBeUsedOnce
+   * @param {Function(user_id)} config.plugin.PasswordRepo.getPasswordForId
+   */
   createAuthentication: async function (config) {
     if (!AUTH.__created) {
       if (!config.plugin) {

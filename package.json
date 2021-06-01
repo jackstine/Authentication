@@ -1,6 +1,6 @@
 {
   "name": "@nodeauth/authentication",
-  "version": "0.0.14",
+  "version": "0.0.17",
   "description": "Authentication",
   "main": "src/index.js",
   "scripts": {
