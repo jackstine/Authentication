@@ -1,5 +1,6 @@
 const {Users} = require('../../../../appSystems/auth/logic/users')
-const {usersMock} = require('../../../mocks')
+const {Token} = require('../../../../appSystems/auth/logic/token')
+const {usersMock, tokenMock} = require('../../../mocks')
 let chai = require('chai')
 let expect = chai.expect
 chai.should()
@@ -158,20 +159,25 @@ describe('Users', function () {
   describe('#updateUser', function () {
     it('should update the user', function (done) {
       users.createUserVerificationAndPassword(userInfo).then(async userAndVerification => {
-        users.updateUser(userUpdateInfo).then(resp => {
+        let T = new Token({...tokenMock})
+        let token = await T.generateToken(userInfo)
+        users.updateUser(userUpdateInfo, token.token).then(resp => {
           expect(resp.success).to.be.equal(true)
           expect(resp.user.shirt).to.be.equal(userUpdateInfo.shirt)
           done()
         }).catch(console.error)
-      })
+      }).catch(console.error)
     })
     it('should return false if the user does not exist', function (done) {
-      users.updateUser({user_id: 'something'}).then(async resp => {
-        expect(resp.success).to.be.equal(false)
-        resp = await users.updateUser(null)
-        expect(resp.success).to.be.equal(false)
-        done()
-      }).catch(console.error)
+      let T = new Token({...tokenMock})
+      T.generateToken(userInfo).then(token => {
+        users.updateUser({user_id: 'something'}, token.token).then(async resp => {
+          expect(resp.success).to.be.equal(false)
+          resp = await users.updateUser(null)
+          expect(resp.success).to.be.equal(false)
+          done()
+        }).catch(console.error)
+      })
     })
   })
 })

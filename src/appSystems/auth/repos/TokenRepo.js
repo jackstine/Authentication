@@ -41,6 +41,11 @@ class TokenRepo {
     }
   }
 
+  async authenticateToken (token) {
+    let keyStore = await this.getKeyStore()
+    return await keyStore.checkToken(token)
+  }
+
   async __getAllKeys() {
     if (!this.__keyStore) {
       let keys = await this.plugin.returnAllKeysFromRepo()

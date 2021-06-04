@@ -1,3 +1,5 @@
+const Bluebird = require('bluebird')
+
 class Token {
   /**
    * 
@@ -19,13 +21,27 @@ class Token {
     this.userRepo = this.repos.userRepo
     this.tokenRepo = this.repos.tokenRepo
     this.temporaryPasswordRepo = this.repos.temporaryPasswordRepo
+    this.userVerificationRepo = this.repos.userVerificationRepo
+    this.google = require('./google-auth').google
+    this.googleClientId = options.googleClientId
   }
   /**
    * 
    * @param {*} user_id 
    */
   async generateToken (user_id) {
-    return await this.tokenRepo.generateNewToken(user_id)
+    if (user_id) {
+      let user_id_is_object = typeof user_id === 'object' && user_id !== null
+      if (!user_id_is_object) {
+        user_id = {user_id}
+      }
+      // TODO probably need to get the user, to ensure that the
+      // user_id is valid.
+      // let user = await this.userRepo.getUser(user_id)
+      return await this.tokenRepo.generateNewToken(user_id)
+    } else {
+      throw Error('The User Id does not exist, we cannot make a user')
+    }
   }
   /**
    * 
@@ -33,8 +49,7 @@ class Token {
    */
   async authenticateToken (token) {
     try {
-      let keyStore = await this.tokenRepo.getKeyStore()
-      return await keyStore.checkToken(token)
+      return await this.tokenRepo.authenticateToken(token)
     } catch (ex) {
       return false
     }
@@ -48,7 +63,7 @@ class Token {
     if (user_id && password) {
       let passwordResult = await this.passwordRepo.checkPassword(user_id, password)
       if (passwordResult) {
-        let ps = await Promise.all([this.generateToken(user_id), this.userRepo.getUser(user_id)])
+        let ps = await Promise.all([this.generateToken({user_id}), this.userRepo.getUser(user_id)])
         return {success: true, token: ps[0], user: ps[1]}
       } else {
         let isForgottenPassword = await this.temporaryPasswordRepo.verifyTemporyPassword(user_id, password)
@@ -58,6 +73,36 @@ class Token {
       }
     }
     return {success: false}
+  }
+
+  async googleSignin (token) {
+    this.google.setup(this.googleClientId)
+    let result = await this.google.verify(token)
+    if (result.success) {
+      let user = result.user
+      user.user_id = user.email
+      let user_id = user.user_id
+      let userExists = await this.userRepo.getUser(user_id)
+      if (!userExists) {
+        let userData = await Bluebird.props({
+          success: true,
+          is_new_user: true,
+          user: this.userRepo.createUser(user),
+          verification: this.userVerificationRepo.createVerificationCode(user_id),
+          token: this.tokenRepo.generateNewToken(user_id)
+        })
+        return userData
+      } else {
+        return await Bluebird.props({
+          success: true,
+          is_new_user: false,
+          user: user,
+          token: this.tokenRepo.generateNewToken(user_id)
+        })
+      }
+    } else {
+      return {success: false}
+    }
   }
 }
 

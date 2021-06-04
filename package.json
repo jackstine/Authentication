@@ -1,6 +1,6 @@
 {
   "name": "@nodeauth/authentication",
-  "version": "0.0.17",
+  "version": "0.0.20",
   "description": "Authentication",
   "main": "src/index.js",
   "scripts": {
@@ -15,12 +15,13 @@
   "license": "ISC",
   "dependencies": {
     "bluebird": "^3.7.2",
+    "google-auth-library": "^7.1.1",
     "jsonwebtoken": "^8.5.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
     "chai": "^4.3.4",
-    "dotenv": "^8.2.0",
+    "dotenv": "^8.6.0",
     "pg": "^8.6.0"
   }
 }

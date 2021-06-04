@@ -44,13 +44,20 @@ class Users {
     return {...userData, user}
   }
 
-  async updateUser (userInfo) {
+  async updateUser (userInfo, authToken) {
+    let result = {success: false}
     try {
-      let success = await this.userRepo.updateUser(userInfo)
-      return {success, user: userInfo}
+      if (authToken) {
+        let auth = await this.tokenRepo.authenticateToken(authToken)
+        if (userInfo.user_id.toLowerCase() === auth.data.user_id.toLowerCase()) {
+          let success = await this.userRepo.updateUser(userInfo)
+          result = {success, user: userInfo}
+        }
+      }
     } catch (ex) {
-      return {success: false}
+      console.error(ex)
     }
+    return result
   }
 
 

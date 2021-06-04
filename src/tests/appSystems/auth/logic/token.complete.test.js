@@ -17,11 +17,12 @@ let userInfo = {
   password: 'password'
 }
 let vc = 'd4a2435d-9287-414c-aee7-824d5527e1d7'
-let token = new Token({...tokenMock})
+let token = null
 
 describe('Token', function () {
   before(function (done) {
-    token = new Token({...tokenMock})
+    token = new Token({...tokenMock, googleClientId: process.env.GOOGLE_CLIENT_ID})
+    MockPlugin.reset()
     done()
   })
 
@@ -42,18 +43,20 @@ describe('Token', function () {
   })
   describe('#authenticateToken', function () {
     it('it should authenticate the user', function (done) {
-      token.generateToken(userInfo).then(async generatedAuthToken => {
+      token.generateToken(userInfo.user_id).then(async generatedAuthToken => {
         expect(generatedAuthToken.token).to.be.an('string')
         let auth = await token.authenticateToken(generatedAuthToken.token)
-        auth.should.be.equal(true)
+        auth.success.should.be.equal(true)
+        auth.data.user_id.should.be.equal(userInfo.user_id)
         done()
       }).catch(console.error)
     })
     it('it should return false on false authentication', function (done) {
-      token.generateToken(userInfo).then(async generatedAuthToken => {
+      token.generateToken(userInfo.user_id).then(async generatedAuthToken => {
         expect(generatedAuthToken.token).to.be.an('string')
         let auth = await token.authenticateToken(generatedAuthToken.token)
-        auth.should.be.equal(true)
+        auth.success.should.be.equal(true)
+        auth.data.user_id.should.be.equal(userInfo.user_id)
         let authResp = await token.authenticateToken('eyJhbGciOiJIUzI1NiJ9.bmFtZUByYWVtaXN0ZW1haWwuY29t.d5qu_8bzMwhWygglDWKbY9n4daCYbnbR4w-enghUI5c')
         expect(authResp).to.be.equal(false)
         done()
@@ -61,10 +64,6 @@ describe('Token', function () {
     })
   })
   describe('#login', function () {
-    before(function (done) {
-      MockPlugin.reset()
-      done()
-    })
     it('should login the user', function (done) {
       let password = userInfo.password
       let users = new Users({...usersMock})
@@ -124,5 +123,28 @@ describe('Token', function () {
         }).catch(console.error)
       }).catch(console.error)
     })//END OF IT
+  })
+  describe('#googleSignin', function () {
+    it.skip('should sign in the user', function (done) {
+      token.googleSignin(process.env.GOOGLE_TOKEN).then(async resp => {
+        let {is_new_user, user, verification, success} = resp
+        let token_resp = resp.token
+        expect(success).to.be.equal(true)
+        expect(user.user_id).to.be.equal('ecstaticjack@gmail.com')
+        expect(user.verified).to.be.equal(false)
+        expect(verification.user_id).to.be.equal('ecstaticjack@gmail.com')
+        expect(verification.verification_code).to.be.a('string')
+        expect(token_resp.token).to.be.a('string')
+        expect(token_resp.expires).to.be.a('number')
+        expect(is_new_user).to.be.equal(true)
+        let st = await token.googleSignin(process.env.GOOGLE_TOKEN)
+        expect(st.success).to.be.equal(true)
+        expect(st.user.user_id).to.be.equal('ecstaticjack@gmail.com')
+        expect(st.token.token).to.be.a('string')
+        expect(st.token.expires).to.be.a('number')
+        expect(st.is_new_user).to.be.equal(false)
+        done()
+      }).catch(console.error)
+    })
   })
 })

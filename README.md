@@ -41,7 +41,7 @@ Create a plugin using these methods and objects that comprise the plugin. Each s
 * verifyUser {(user_id)} - returns {verified, user_id}
 * createUser {(user)} - returns {Object} user
 * getUser {(user)} - returns {Object} user
-* updateUser {(user)} - reutrns {Object} updatedUserInfo
+* updateUser {(user), token} - reutrns {Object} updatedUserInfo
 ### UserVerificationRepo
 * getVerificationCode {(verification_code)}  -- {verification_code, created}
 * createVerificationCode {(user_id, verification_code)}   -- returns {user_id, verification_code}

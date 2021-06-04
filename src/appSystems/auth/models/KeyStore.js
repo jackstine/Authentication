@@ -13,8 +13,8 @@ class KeyStore {
   async checkToken (token) {
     for (let k of this.__keys) {
       try{
-        let info = await crypt.de(token, k.key)
-        return true
+        let data = await crypt.de(token, k.key)
+        return {success: true, data}
       } catch (err) {
         // try catch for when decryption does not return successfully
       }
