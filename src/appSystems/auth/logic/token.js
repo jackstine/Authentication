@@ -75,6 +75,11 @@ class Token {
     return {success: false}
   }
 
+  /**
+   * 
+   * @param {*} token 
+   * @returns 
+   */
   async googleSignin (token) {
     this.google.setup(this.googleClientId)
     let result = await this.google.verify(token)

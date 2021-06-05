@@ -21,8 +21,13 @@ class Authentication {
     this.repos = {}
     this.options = {
       keyStore: {...DEFAULT_KEY_STORE, ...config.keyStore},
-      tempPasswordOptions: {...DEFAULT_TEMP_PASS, ...config.temporaryPasswordOptions}
+      tempPasswordOptions: {...DEFAULT_TEMP_PASS, ...config.temporaryPasswordOptions},
     }
+    Object.keys(config).forEach((key) => {
+      if (!this.options[key]){
+        this.options[key] = config[key]
+      }
+    })
     this.addPlugin(config.plugin)
   }
   addPlugin(plugin) {
