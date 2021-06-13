@@ -1,6 +1,6 @@
 {
   "name": "@nodeauth/authentication",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "Authentication",
   "main": "src/index.js",
   "scripts": {
@@ -17,6 +17,7 @@
     "bluebird": "^3.7.2",
     "google-auth-library": "^7.1.1",
     "jsonwebtoken": "^8.5.1",
+    "stripe": "^8.153.0",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
