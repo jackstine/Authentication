@@ -1,6 +1,6 @@
-const {Users} = require('./users')
-const {Token} = require('./token')
+const { createUsers } = require("./users");
+const { createToken } = require("./token");
 module.exports = {
-  Users,
-  Token
-}
+  createUsers,
+  createToken,
+};

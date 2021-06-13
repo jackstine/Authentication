@@ -1,47 +1,48 @@
 class UserRepo {
   constructor(options) {
     if (!options.plugin) {
-      throw Error('there is no plugin')
+      throw Error("there is no plugin");
     }
-    this.plugin = options.plugin
+    this.plugin = options.plugin;
   }
 
   /**
-   * 
-   * @param {*} user 
+   *
+   * @param {string} user.email
+   * @param {*} user[anything]
    */
   async createUser(user) {
-    if (!user.user_id) {
-      throw Error('must contain user_id attribute in user Object')
+    if (!user.email) {
+      throw Error("must contain email attribute in user Object");
     }
-    user.user_id = user.user_id.toLowerCase()
-    user = await this.plugin.createUser(user)
-    if (!user.user_id) {
-      throw Error('plugin UserRepo createUser() must return object with an attribute of "user_id"')
+    user.email = user.email.toLowerCase();
+    user = await this.plugin.createUser(user);
+    if (!user.email) {
+      throw Error('plugin UserRepo createUser() must return object with an attribute of "email"');
     }
-    return user
+    return user;
   }
 
-  async userIsVerified (user_id) {
-    return this.plugin.getUserIsVerified(user_id.toLowerCase())
+  async userIsVerified(email) {
+    return this.plugin.getUserIsVerified(email.toLowerCase());
   }
 
-  async verifyUser (user_id) {
-    return this.plugin.verifyUser(user_id.toLowerCase())
+  async verifyUser(email) {
+    return this.plugin.verifyUser(email.toLowerCase());
   }
 
-  async getUser (user_id) {
-    if (user_id) {
-      return this.plugin.getUser(user_id.toLowerCase())
+  async getUser(email) {
+    if (email) {
+      return this.plugin.getUser(email.toLowerCase());
     } else {
-      return null
+      return null;
     }
   }
 
-  async updateUser (userInfo) {
-    userInfo.user_id = userInfo.user_id.toLowerCase()
-    return this.plugin.updateUser(userInfo)
+  async updateUser(userInfo) {
+    userInfo.email = userInfo.email.toLowerCase();
+    return this.plugin.updateUser(userInfo);
   }
 }
 
-module.exports = UserRepo
+module.exports = UserRepo;

@@ -26,12 +26,12 @@ await createAuthentication(config);
 
 ## Options
 
-|Name|Type|Description|
-| :---        |    :----:   |          ---: |
-|googleClientId|String|the Google Client ID so that you can authenticate Google Tokens|
-|tempPasswordOptions.tempPasswordLifetime|Number||
-|keyStore.keyCount|Number|The key count, the number of keys that are used to verify a token, making the key expire in (keyCount \* timeLimit) time|
-|keyStore.timeLimit|Number|The time limit each key lasts|
+| Name                                     |  Type  |                                                                                                              Description |
+| :--------------------------------------- | :----: | -----------------------------------------------------------------------------------------------------------------------: |
+| googleClientId                           | String |                                                          the Google Client ID so that you can authenticate Google Tokens |
+| tempPasswordOptions.tempPasswordLifetime | Number |                                                                                                                          |
+| keyStore.keyCount                        | Number | The key count, the number of keys that are used to verify a token, making the key expire in (keyCount \* timeLimit) time |
+| keyStore.timeLimit                       | Number |                                                                                            The time limit each key lasts |
 
 ## Plugin
 
@@ -39,10 +39,10 @@ Create a plugin using these methods and objects that comprise the plugin. Each s
 
 ### TemporaryPasswordRepo
 
-- insertNewUserIdAndPassword {user_id, newRandomPassword} - return {expiresIn, user_id, password}
-- selectTemporaryPasswordById {user_id} - return {created, password}
+- insertNewUserIdAndPassword {email, newRandomPassword} - return {expiresIn, email, password}
+- selectTemporaryPasswordById {email} - return {created, password}
 - deleteAllOldTempPasswords {timesUpLimit} - returns null
-- deleteTempPassword {user_id} - returns null
+- deleteTempPassword {email} - returns null
 
 ### TokenRepo
 
@@ -52,8 +52,8 @@ Create a plugin using these methods and objects that comprise the plugin. Each s
 
 ### UserRepo
 
-- getUserIsVerified {(user_id)} - returns {string, string}{user_id, verified}
-- verifyUser {(user_id)} - returns {verified, user_id}
+- getUserIsVerified {(email)} - returns {string, string}{email, verified}
+- verifyUser {(email)} - returns {verified, email}
 - createUser {(user)} - returns {Object} user
 - getUser {(user)} - returns {Object} user
 - updateUser {(user), token} - reutrns {Object} updatedUserInfo
@@ -61,12 +61,12 @@ Create a plugin using these methods and objects that comprise the plugin. Each s
 ### UserVerificationRepo
 
 - getVerificationCode {(verification_code)} -- {verification_code, created}
-- createVerificationCode {(user_id, verification_code)} -- returns {user_id, verification_code}
+- createVerificationCode {(email, verification_code)} -- returns {email, verification_code}
 - deleteVerificationCode {(verification_code)} -- returns nothing
 
 ### PasswordRepo
 
-- insertPassword {({user_id, password, key})} -- returns encryptedPassword
-- deletePasswordById {(user_id)} -- nothing returned
-- updatePasswordOnlyShouldBeUsedOnce {(user_id, password, key)} -- does not return anything
-- getPasswordForId {(user_id)} -- return {encryptedpassword, key}
+- insertPassword {({email, password, key})} -- returns encryptedPassword
+- deletePasswordById {(email)} -- nothing returned
+- updatePasswordOnlyShouldBeUsedOnce {(email, password, key)} -- does not return anything
+- getPasswordForId {(email)} -- return {encryptedpassword, key}

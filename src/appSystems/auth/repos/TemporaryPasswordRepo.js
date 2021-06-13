@@ -1,44 +1,50 @@
-const CRYPT = require('../../../common/crypt')
+const CRYPT = require("../../../common/crypt");
 
 class TemporaryPasswordRepo {
-  constructor({plugin, options}) {
-    this.plugin = plugin
-    this.TIME_LIMIT = options.tempPasswordLifetime
+  constructor({ plugin, options }) {
+    this.plugin = plugin;
+    this.TIME_LIMIT = options.tempPasswordLifetime;
   }
-  async createTempPassword (user_id) {
-    let newRandomPassword = CRYPT.generateRandomString(10)
-    let tempPassword = await this.plugin.insertNewUserIdAndPassword(user_id.toLowerCase(), newRandomPassword, new Date())
-    if (!tempPassword.user_id) {
-      throw Error('plugin TemporaryPasswordRepo insertNewUserIdAndPassword() must return object with an attribute of "user_id"')
+  async createTempPassword(email) {
+    let newRandomPassword = CRYPT.generateRandomString(10);
+    let tempPassword = await this.plugin.insertNewUserIdAndPassword(
+      email.toLowerCase(),
+      newRandomPassword,
+      new Date()
+    );
+    if (!tempPassword.email) {
+      throw Error(
+        'plugin TemporaryPasswordRepo insertNewUserIdAndPassword() must return object with an attribute of "email"'
+      );
     }
-    tempPassword.expiresIn = this.TIME_LIMIT
-    return tempPassword
+    tempPassword.expiresIn = this.TIME_LIMIT;
+    return tempPassword;
   }
 
-  async verifyTemporyPassword (id, password) {
-    let data = await this.plugin.selectTemporaryPasswordById(id.toLowerCase())
+  async verifyTemporyPassword(id, password) {
+    let data = await this.plugin.selectTemporaryPasswordById(id.toLowerCase());
     if (data) {
-      return this.__withinTimeLimit(data.created) && data.password === password
+      return this.__withinTimeLimit(data.created) && data.password === password;
     } else {
-      return false
+      return false;
     }
   }
 
-  async deleteAllOldTempPasswords () {
-    await this.plugin.deleteAllOldTempPasswords(this.TIME_LIMIT)
+  async deleteAllOldTempPasswords() {
+    await this.plugin.deleteAllOldTempPasswords(this.TIME_LIMIT);
   }
 
-  async delete (id) {
-    return await this.plugin.deleteTempPassword(id.toLowerCase()).then(resp => {
-      return true
-    })
+  async delete(id) {
+    return await this.plugin.deleteTempPassword(id.toLowerCase()).then((resp) => {
+      return true;
+    });
   }
 
-  __withinTimeLimit (createdTimestamp) {
-    let timeLimit = new Date().setTime(new Date(createdTimestamp).getTime() + this.TIME_LIMIT)
-    let now = new Date()
-    return timeLimit > now
+  __withinTimeLimit(createdTimestamp) {
+    let timeLimit = new Date().setTime(new Date(createdTimestamp).getTime() + this.TIME_LIMIT);
+    let now = new Date();
+    return timeLimit > now;
   }
 }
 
-module.exports = TemporaryPasswordRepo
+module.exports = TemporaryPasswordRepo;

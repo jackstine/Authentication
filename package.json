@@ -1,12 +1,12 @@
 {
   "name": "@nodeauth/authentication",
-  "version": "0.0.24",
+  "version": "0.0.26",
   "description": "Authentication",
   "main": "src/index.js",
   "scripts": {
-    "test": "export AUTH_ENV=dev && mocha --file src/tests/setup_test.js $(find src/tests/* -name '*.nc.test.js')",
-    "test-complete": "export AUTH_ENV=dev && mocha --file src/tests/setup_test.js $(find src/tests/* -name '*.complete.test.js')",
-    "test-all": "export AUTH_ENV=dev && mocha --file src/tests/setup_test.js $(find src/tests/* -name '*.test.js')"
+    "test": "export AUTH_ENV=dev && node node_modules/mocha/bin/mocha --file src/tests/setup_test.js $(find src/tests/* -name '*.nc.test.js')",
+    "test-complete": "export AUTH_ENV=dev && node node_modules/mocha/bin/mocha --file src/tests/setup_test.js $(find src/tests/* -name '*.complete.test.js')",
+    "test-all": "export AUTH_ENV=dev && node node_modules/mocha/bin/mocha --file src/tests/setup_test.js $(find src/tests/* -name '*.test.js')"
   },
   "keywords": [
     "authentication"
@@ -23,6 +23,7 @@
   "devDependencies": {
     "chai": "^4.3.4",
     "dotenv": "^8.6.0",
+    "mocha": "^9.0.0",
     "pg": "^8.6.0"
   }
 }
