@@ -6,6 +6,7 @@ module.exports = {
    * @param options.plugin
    * @param options.repos
    * @param options.keyStore
+   * @param options.tokenize -- this is a async function that returns data to be added to the token
    * @param options.googleClientId
    */
   createToken: function (options) {
@@ -21,6 +22,7 @@ module.exports = {
     return {
       repos: options.repos,
       keyStore: options.keyStore,
+      tokenize: options.tokenize,
       passwordRepo: options.repos.passwordRepo,
       userRepo: options.repos.userRepo,
       tokenRepo: options.repos.tokenRepo,
@@ -39,9 +41,16 @@ module.exports = {
           if (!isObject) {
             userObject = { email: userObject };
           }
-          let user = await this.userRepo.getUser(userObject.email);
+          // the tokenize() method is a plugin that return any data 
+          // that will spread into the token
+          let user = await Promise.all([
+            await this.userRepo.getUser(userObject.email),
+            await this.tokenize()
+          ])
           if (user) {
-            return await this.tokenRepo.generateNewToken(userObject);
+            let u = user[0]
+            let t = user[1]
+            return await this.tokenRepo.generateNewToken({...u, ...t});
           }
         }
         throw Error("The Email does not exist, we cannot make a user");
@@ -62,15 +71,13 @@ module.exports = {
        * @param {*} email
        * @param {*} password
        */
-      login: async function (email, password) {
+      login: async function (email, password, addToToken) {
         if (email && password) {
           let passwordResult = await this.passwordRepo.checkPassword(email, password);
           if (passwordResult) {
-            let ps = await Promise.all([
-              this.generateToken({ email }),
-              this.userRepo.getUser(email),
-            ]);
-            return { success: true, token: ps[0], user: ps[1] };
+            let user = await this.userRepo.getUser(email)
+            let token = await this.generateToken({user, ...addToToken})
+            return { success: true, token, user };
           } else {
             let isForgottenPassword = await this.temporaryPasswordRepo.verifyTemporyPassword(
               email,

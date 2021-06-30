@@ -87,13 +87,15 @@ describe("Token", function () {
       users
         .createUserVerificationAndPassword(userInfo)
         .then(async (userVerification) => {
-          let loginResponse = await token.login(email, password);
+          let loginResponse = await token.login(email, password, undefined);
           let lu = loginResponse.user;
           expect(loginResponse.success).to.be.equal(true);
           expect(loginResponse.token.token).to.be.a("string");
           expect(loginResponse.token.expires).to.be.a("number");
           expect(lu.email).to.be.equal(email.toLowerCase());
           expect(lu.verified).to.be.equal(false);
+          loginResponse = await token.login(email, password, {hello: "world"});
+          expect(loginResponse.token.token).to.be.a("string");
           done();
         })
         .catch(console.error);
