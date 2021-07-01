@@ -18,6 +18,7 @@ let userInfo = {
 let cloneUserInfo = { ...userInfo };
 let vc = "d4a2435d-9287-414c-aee7-824d5527e1d7";
 let token = null;
+let addToAddToToken = {customerId: 'cust-12232', dogId: 'doggo'}
 
 describe("Token", function () {
   before(function (done) {
@@ -41,6 +42,26 @@ describe("Token", function () {
             .catch(console.error);
         });
     });
+    it("should be able to add to token", function (done) {
+      userInfo.password = cloneUserInfo.password
+      createUsers({ ...usersMock })
+        .createUserVerificationAndPassword(userInfo)
+        .then((resp) => {
+          token
+            .generateToken(userInfo.email, addToAddToToken)
+            .then(async (generatedAuthToken) => {
+              let auth = await token.authenticateToken(generatedAuthToken.token)
+              expect(generatedAuthToken.token).to.be.an("string");
+              expect(generatedAuthToken.expires).to.be.an("number");
+              expect(auth.success).to.be.equal(true)
+              expect(auth.data.customerId).to.equal(addToAddToToken.customerId)
+              expect(auth.data.dogId).to.equal(addToAddToToken.dogId)
+              done();
+            })
+            .catch(console.error);
+        }).catch(console.error);
+    });
+    
     it("should fail when a undefined or null is inserted", function (done) {
       token.generateToken(null).catch((err) => {
         expect(err.message).to.be.a("string");
@@ -87,7 +108,7 @@ describe("Token", function () {
       users
         .createUserVerificationAndPassword(userInfo)
         .then(async (userVerification) => {
-          let loginResponse = await token.login(email, password, undefined);
+          let loginResponse = await token.login(email, password, addToAddToToken); 
           let lu = loginResponse.user;
           expect(loginResponse.success).to.be.equal(true);
           expect(loginResponse.token.token).to.be.a("string");

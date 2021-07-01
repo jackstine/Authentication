@@ -23,7 +23,6 @@ class Authentication {
     this.plugin = DefaultPlugin;
     this.repos = {};
     this.options = {
-      tokenize: config.tokenize || function () {},
       keyStore: { ...DEFAULT_KEY_STORE, ...config.keyStore },
       tempPasswordOptions: { ...DEFAULT_TEMP_PASS, ...config.temporaryPasswordOptions },
     };

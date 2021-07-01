@@ -6,7 +6,6 @@ module.exports = {
    * @param options.plugin
    * @param options.repos
    * @param options.keyStore
-   * @param options.tokenize -- this is a async function that returns data to be added to the token
    * @param options.googleClientId
    */
   createToken: function (options) {
@@ -22,7 +21,6 @@ module.exports = {
     return {
       repos: options.repos,
       keyStore: options.keyStore,
-      tokenize: options.tokenize,
       passwordRepo: options.repos.passwordRepo,
       userRepo: options.repos.userRepo,
       tokenRepo: options.repos.tokenRepo,
@@ -35,22 +33,17 @@ module.exports = {
        * @param {string} userObject.email
        * @param {*} userObject[anything]
        */
-      generateToken: async function (userObject) {
+      generateToken: async function (userObject, addToToken) {
         if (userObject) {
+          // if the user object is a email, its good else put it in a object
           let isObject = typeof userObject === "object" && userObject !== null;
           if (!isObject) {
             userObject = { email: userObject };
           }
-          // the tokenize() method is a plugin that return any data 
-          // that will spread into the token
-          let user = await Promise.all([
-            await this.userRepo.getUser(userObject.email),
-            await this.tokenize()
-          ])
+          let user = await this.userRepo.getUser(userObject.email)
+          // TODO the addToToken could be an function
           if (user) {
-            let u = user[0]
-            let t = user[1]
-            return await this.tokenRepo.generateNewToken({...u, ...t});
+            return await this.tokenRepo.generateNewToken({...user, ...addToToken});
           }
         }
         throw Error("The Email does not exist, we cannot make a user");
@@ -76,7 +69,7 @@ module.exports = {
           let passwordResult = await this.passwordRepo.checkPassword(email, password);
           if (passwordResult) {
             let user = await this.userRepo.getUser(email)
-            let token = await this.generateToken({user, ...addToToken})
+            let token = await this.generateToken(user, addToToken)
             return { success: true, token, user };
           } else {
             let isForgottenPassword = await this.temporaryPasswordRepo.verifyTemporyPassword(
@@ -95,21 +88,26 @@ module.exports = {
        * @param {*} token
        * @returns
        */
-      googleSignin: async function (token) {
+      googleSignin: async function (token, addToToken) {
         this.google.setup(this.googleClientId);
         let result = await this.google.verify(token);
         if (result.success) {
           let user = result.user;
           user.email = user.email;
           let email = user.email;
-          let userExists = await this.userRepo.getUser(email);
+          let ps = new Promise.all([
+            await addToToken({user: {email}}),
+            await this.userRepo.getUser(email)
+          ])
+          let tokenizeData = ps[0]
+          let userExists = ps[1]
           if (!userExists) {
             let userData = await Bluebird.props({
               success: true,
               is_new_user: true,
               user: this.userRepo.createUser(user),
               verification: this.userVerificationRepo.createVerificationCode(email),
-              token: this.tokenRepo.generateNewToken(user),
+              token: this.tokenRepo.generateNewToken({...user, ...tokenizeData}),
             });
             return userData;
           } else {

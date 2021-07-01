@@ -32,7 +32,6 @@ await createAuthentication(config);
 | tempPasswordOptions.tempPasswordLifetime | Number |                                                                                                                          |
 | keyStore.keyCount                        | Number | The key count, the number of keys that are used to verify a token, making the key expire in (keyCount \* timeLimit) time |
 | keyStore.timeLimit                       | Number |                                                                                            The time limit each key lasts |
-| tokenize | Function | the returned data is added to the token |
 
 ## Plugin
 

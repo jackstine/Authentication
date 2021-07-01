@@ -28,7 +28,6 @@ module.exports = {
   tokenMock: {
     plugin: PluginMock,
     keyStore: constants.DEFAULT_KEY_STORE,
-    tokenize: function () {},
     repos
   }
 }
